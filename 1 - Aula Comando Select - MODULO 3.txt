@@ -1,0 +1,59 @@
+SELECT * FROM DimCustomer
+
+SELECT * FROM DimStore
+
+select StoreKey, StoreName, StorePhone FROM DimStore
+
+SELECT * FROM DimProduct
+
+SELECT ProductName, BrandName FROM DimProduct 
+
+SELECT * FROM DimEmployee
+
+SELECT FirstName, EmailAddress from DimEmployee
+
+-- O comando SELECT TOP(N) PERCENT: retorna as N primeiras linhas
+
+-- 1. Crie um código que retorna as 10 primeiras linhas da tabela de Produtos.
+
+SELECT TOP(10) * FROM DimProduct
+
+
+-- 2. Retorna as 10% primeiras linhas da tabela de clientes
+
+SELECT TOP(10) PERCENT * FROM DimCustomer
+
+-- Novo comando chamado: SELECT DISTINCT - retorna os valores distintos de uma tabela
+
+-- Retorna todas as linhas da tabela DimProduct
+
+SELECT * FROM DimProduct
+
+-- Retorna os valores distintos da coluna ColorName da Tabela DimProduct
+
+SELECT DISTINCT ColorName FROM DimProduct
+
+-- Retorna todas as linhas da tabela DimEmployee
+
+SELECT * FROM DimEmployee
+
+-- Retorna os valores distintos da coluna DepartName da tabela DimEmployee
+
+SELECT
+	DISTINCT DepartmentName
+FROM
+	DimEmployee
+
+SELECT TOP(1000) * FROM FactSales
+
+-- Comando AS: Renomeando colunas (aliasing)
+
+-- Selecione as 3 colunas da tabela DimProduct: ProductName, BrandName e ColorName
+
+SELECT 
+	ProductName AS 'NOME_PRODUTO', 
+	BrandName AS 'MARCA', 
+	ColorName AS 'COR' 
+FROM 
+	DimProduct
+

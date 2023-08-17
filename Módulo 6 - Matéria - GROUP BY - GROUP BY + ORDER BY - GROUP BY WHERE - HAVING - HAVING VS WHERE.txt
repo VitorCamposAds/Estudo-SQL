@@ -1,0 +1,382 @@
+-- MÓDULO 6 - FUNÇÕES DE AGREGAÇÃO CRIANDO AGRUPAMENTOS - GROUP BY - GROUP BY + ORDER BY - GROUP BY WHERE - HAVING - HAVING VS WHERE
+
+SELECT * FROM DimProduct
+
+SELECT
+	BrandName AS 'NOME DA MARCA',
+	COUNT(*) AS 'QTD.TOTAL'
+FROM
+	DimProduct
+GROUP BY BrandName
+
+-- GROUP BY + SUM
+
+SELECT * FROM DimStore
+
+SELECT
+	StoreType,
+	SUM(EmployeeCount) AS 'NÚMERO DE FUNCIONÁRIOS'
+FROM
+	DimStore
+GROUP BY StoreType
+
+-- GROUP BY + AVG
+
+SELECT * FROM DimProduct
+
+SELECT
+	BrandName AS 'MARCA',
+	AVG(UnitCost) AS 'CUSTO UNITÁRIO'
+FROM
+	DimProduct
+GROUP BY BrandName
+
+-- GROUP BY + MAX/MIN
+
+SELECT * FROM DimProduct
+
+SELECT
+	ClassName AS 'CLASSE DO PRODUTO',
+	MAX(UnitPrice) AS 'PREÇO_UNIDADE'
+FROM
+	DimProduct
+GROUP BY ClassName
+
+-- GROUP BY + ORDER BY
+
+SELECT * FROM DimStore
+
+SELECT
+	StoreType AS 'TIPO DE LOJA',
+	SUM(EmployeeCount) 'QTD.FUNCIONÁRIOS'
+FROM
+	DimStore
+GROUP BY StoreType
+ORDER BY SUM(EmployeeCount) DESC
+
+-- WHERE E GROUP BY
+
+SELECT * FROM DimProduct
+
+SELECT
+	ColorName AS 'COR',
+	COUNT(*) AS 'TOTAL DE PRODUTOS'
+FROM DimProduct
+WHERE BrandName = 'Contoso'
+GROUP BY ColorName
+ORDER BY COUNT(*) DESC
+
+-- GROUP BY + HAVE
+
+SELECT * FROM DimProduct
+
+SELECT
+	BrandName AS 'MARCA',
+	COUNT(BrandName) AS 'TOTAL POR MARCA'
+FROM
+	DimProduct
+GROUP BY BrandName
+HAVING COUNT(BrandName) >= 200
+
+-- WHERE VS HAVE
+
+SELECT * FROM DimProduct
+
+SELECT
+	BrandName AS 'MARCA',
+	COUNT(BrandName) AS 'TOTAL MARCA'
+FROM
+	DimProduct
+WHERE ClassName = 'Economy' -- filtra a tabela original, antes do agrupamento.
+GROUP BY BrandName
+HAVING COUNT(BrandName) >= 200 -- filtra a tabela depois de agrupada.
+
+
+
+-- EXERCÍCIOS
+
+/* Os exercícios abaixo estão divididos de acordo com uma determinada tabela do Banco de Dados.
+FACTSALES
+
+1. a) Faça um resumo da quantidade vendida (SalesQuantity) de acordo com o canal de vendas
+(channelkey). */
+
+SELECT
+	TOP(100) *
+FROM
+	FactSales
+
+SELECT
+	ChannelKey AS 'CANAL DE VENDA',
+	SUM(SalesQuantity) AS 'TOTAL_VENDIDO'
+FROM
+	Factsales
+GROUP BY ChannelKey
+ORDER BY SUM(SalesQuantity)
+
+
+
+/* b) Faça um agrupamento mostrando a quantidade total vendida (SalesQuantity) e quantidade
+total devolvida (Return Quantity) de acordo com o ID das lojas (StoreKey). */
+
+SELECT
+	StoreKey AS 'ID LOJA',
+	SUM(SalesQuantity) AS 'QTD.VENDAS',
+	SUM(ReturnQuantity) AS 'QTD.RETORNO'
+FROM
+	FactSales
+GROUP BY StoreKey
+ORDER BY SUM(SalesQuantity) DESC, SUM(ReturnQuantity) DESC
+
+
+/* c) Faça um resumo do valor total vendido (SalesAmount) para cada canal de venda, mas apenas
+para o ano de 2007. */
+
+SELECT
+	TOP(100) DateKey
+FROM
+	FactSales
+WHERE DateKey LIKE '%2007%'
+
+SELECT
+	ChannelKey AS 'CANAL DE VENDA',
+	SUM(SalesAmount) AS 'FATURAMENTO_TOTAL'
+FROM
+	FactSales
+WHERE DateKey LIKE '%2007%'
+-- WHERE DateKey BETWEEN '20070101' AND '20071231'
+GROUP BY ChannelKey
+-- ORDER BY SUM(SalesAmount) desc
+
+
+/*2. Você precisa fazer uma análise de vendas por produtos. O objetivo final é descobrir o valor
+total vendido (SalesAmount) por produto (ProductKey).
+
+a) A tabela final deverá estar ordenada de acordo com a quantidade vendida e, além disso,
+mostrar apenas os produtos que tiveram um resultado final de vendas maior do que
+$5.000.000. */
+
+SELECT
+	TOP(100) *
+FROM
+	FactSales
+
+SELECT
+	ProductKey AS 'ID_PRODUTO',
+	SUM(SalesAmount) AS 'FATURAMENTO_TOTAL'
+FROM
+	FactSales
+GROUP BY ProductKey
+HAVING SUM(SalesAmount) >= 50000
+ORDER BY SUM(SalesAmount) ASC
+
+	
+	
+
+/*b) Faça uma adaptação no exercício anterior e mostre os Top 10 produtos com mais vendas.
+Desconsidere o filtro de $5.000.000 aplicado. */
+
+SELECT
+	TOP(10)
+	ProductKey AS 'ID_PRODUTO',
+	SUM(SalesAmount) AS 'FATURAMENTO_TOTAL'
+FROM
+	FactSales
+GROUP BY ProductKey
+ORDER BY SUM(SalesAmount) DESC
+
+
+
+/*FACTONLINESALES
+
+3. a) Você deve fazer uma consulta à tabela FactOnlineSales e descobrir qual é o ID
+(CustomerKey) do cliente que mais realizou compras online (de acordo com a coluna
+SalesQuantity). ID DO CLIENTE = 19037 */
+
+SELECT
+	TOP(100) *
+FROM
+	FactOnlineSales
+
+SELECT
+	TOP(1)
+	CustomerKey AS 'ID_CLIENTE',
+	SUM(SalesQuantity) AS 'TOTAL_COMPRADO'
+FROM
+	FactOnlineSales
+GROUP BY CustomerKey 
+ORDER BY SUM(salesQuantity) DESC
+
+
+
+
+
+
+
+
+
+/* b) Feito isso, faça um agrupamento de total vendido (SalesQuantity) por ID do produto
+e descubra quais foram os top 3 produtos mais comprados pelo cliente da letra a). */
+
+select CustomerKey From FactOnlineSales
+where CustomerKey = '19037'
+
+SELECT
+	TOP(3)
+	ProductKey AS 'ID_PRODUTO',
+	SUM(SalesQuantity) AS 'TOTAL VENDIDO'
+	
+FROM
+	FactOnlineSales
+WHERE CustomerKey = 19037
+GROUP BY ProductKey
+ORDER BY SUM(SalesQuantity) DESC
+
+
+/*DIMPRODUCT
+
+4. a) Faça um agrupamento e descubra a quantidade total de produtos por marca. */
+
+SELECT * FROM DimProduct
+
+SELECT
+	BrandName AS 'MARCA',
+	COUNT(BrandName) AS 'QTD_TOTAL_PRODUTO'
+FROM
+	DimProduct
+GROUP BY BrandName
+ORDER BY COUNT(BrandName) DESC
+
+
+
+/* b) Determine a média do preço unitário (UnitPrice) para cada ClassName. */
+
+SELECT
+	ClassName AS 'Classe',
+	AVG(UnitPrice) AS 'MÉDIA_PREÇO_UNITÁRIO'
+FROM
+	DimProduct
+GROUP BY ClassName
+
+
+
+/* c) Faça um agrupamento de cores e descubra o peso total que cada cor de produto possui. */
+
+SELECT
+	ColorName AS 'COR',
+	SUM(Weight) AS 'PESO_TOTAL'
+FROM
+	DimProduct
+GROUP BY ColorName
+
+
+
+/*5. Você deverá descobrir o peso total para cada tipo de produto (StockTypeName).
+A tabela final deve considerar apenas a marca ‘Contoso’ e ter os seus valores classificados em
+ordem decrescente. */
+
+SELECT * FROM DimProduct
+
+SELECT
+	StockTypeName AS 'TIPO_DE_ESTOQUE',
+	SUM(Weight) AS 'PESO_TOTAL'
+FROM
+	DimProduct
+WHERE BrandName = 'Contoso'
+GROUP BY StockTypeName
+
+
+/* 6. Você seria capaz de confirmar se todas as marcas dos produtos possuem à disposição todas as
+16 opções de cores? */
+
+SELECT DISTINCT
+	ColorName
+FROM 
+	DimProduct
+
+SELECT
+	BrandName AS 'MARCA',
+	COUNT(DISTINCT ColorName) AS 'QTD_CORES'
+FROM
+	DimProduct
+GROUP BY BrandName
+
+SELECT
+	DISTINCT ColorName
+FROM
+	DimProduct
+WHERE BrandName = 'Proseware'
+
+
+
+/* DIMCUSTOMER
+
+7. Faça um agrupamento para saber o total de clientes de acordo com o Sexo e também a média
+salarial de acordo com o Sexo. Corrija qualquer resultado “inesperado” com os seus
+conhecimentos em SQL. */
+
+SELECT * FROM DimCustomer
+
+SELECT
+	Gender AS 'GÊNERO',
+	COUNT(Gender) AS 'TOTAL_CLIENTE',
+	AVG(YearlyIncome) AS 'MEDIA_RENDA_ANUAL'
+FROM
+	DimCustomer
+--WHERE Gender BETWEEN 'F' AND 'M'
+--WHERE Gender = 'M' and Gender = 'F'
+WHERE Gender IS NOT NULL
+GROUP BY Gender
+
+
+/* 8. Faça um agrupamento para descobrir a quantidade total de clientes e a média salarial de
+acordo com o seu nível escolar. Utilize a coluna Education da tabela DimCustomer para fazer
+esse agrupamento. */
+
+SELECT * FROM DimCustomer
+
+SELECT
+	Education AS 'NÍVEL_ESCOLAR',
+	COUNT(Education) AS 'QTD_total',
+	AVG(YearlyIncome) AS 'MEDIA_RENDA_ANUAL'
+FROM
+	DimCustomer
+WHERE Education IS NOT NULL
+GROUP BY Education
+ORDER BY AVG(YearlyIncome) DESC
+
+
+
+
+
+/* DIMEMPLOYEE
+
+9. Faça uma tabela resumo mostrando a quantidade total de funcionários de acordo com o
+Departamento (DepartmentName). Importante: Você deverá considerar apenas os
+funcionários ativos. */
+
+SELECT * FROM DimEmployee
+
+SELECT
+	DepartmentName AS 'NOME_DO_SETOR',
+	COUNT(EmployeeKey) AS 'QTD_TOTAL_DEPARTAMENTO'
+FROM
+	DimEmployee
+WHERE EndDate IS NULL
+-- WHERE Status = 'Current'
+GROUP BY DepartmentName
+ORDER BY COUNT(EmployeeKey) DESC
+
+
+/* 10. Faça uma tabela resumo mostrando o total de VacationHours para cada cargo (Title). Você
+deve considerar apenas as mulheres, dos departamentos de Production, Marketing,
+Engineering e Finance, para os funcionários contratados entre os anos de 1999 e 2000. */
+
+SELECT * FROM DimEmployee
+
+SELECT
+	Title AS 'CARGO_OCUPADO',
+	SUM(VacationHours) 'HORAS DE FERIAS'
+FROM DimEmployee
+WHERE Gender = 'F' AND DepartmentName IN ('Production', 'Marketing', 'Engineering', 'Finance') AND HireDate BETWEEN '1999-01-01' AND '2000-12-31'
+GROUP BY Title

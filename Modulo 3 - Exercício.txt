@@ -1,0 +1,36 @@
+SELECT
+	TOP(100) *
+FROM
+	DimCustomer
+
+SELECT
+	TOP(20) PERCENT *
+FROM
+	DimCustomer
+
+
+SELECT
+	TOP(100) FirstName, 
+	EmailAddress, 
+	BirthDate
+FROM
+	DimCustomer
+
+SELECT
+	FirstName AS 'NOME', 
+	EmailAddress AS 'ENDEREÇO DE EMAIL', 
+	BirthDate AS 'DATA DE NASCIMENTO'
+FROM
+	DimCustomer
+
+
+SELECT 
+	DISTINCT Manufacturer AS 'PRODUTOR' 
+FROM 
+	DimProduct
+
+
+SELECT
+	DISTINCT ProductKey 
+FROM 
+	factsales

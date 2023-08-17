@@ -1,0 +1,38 @@
+-- Exercício de fixação: and, not e or:
+
+-- 1. Selecione todas as linhas da tabela DimEmployee de funcionários de sexo feminino e do departamento de finanças:
+
+SELECT * FROM DimEmployee
+WHERE Gender = 'F' and DepartmentName = 'finance'
+
+--2. Selecione todas as linhas da tabela DimProduct de produtos da marca Contoso e da cor vermelha e que tenham um UniPrice maior ou igual a 100
+
+SELECT * FROM DimProduct
+WHERE BrandName = 'Contoso' and ColorName = 'Red' and UnitPrice >= 100
+
+-- 3. Selecione todas as linhas da tabela DimProduct com produtos da marca Litware ou da marca Fabrikam ou da cor preta
+
+SELECT * FROM DimProduct
+WHERE BrandName = 'Litware' or BrandName = 'Fabrikam' or ColorName = 'Black'
+
+-- 4. Selecione todas as linhas da tabela DimSalesTerritory onde o continente é a Europa mas o país não é a Itália
+
+SELECT * FROM DimSalesTerritory
+WHERE SalesTerritoryGroup = 'Europe' and not SalesTerritoryCountry = 'Italy'
+
+-- Cuidados ao utilizar o AND em conjunto com o OR
+-- Exemplo: Selecione todas as linhas da tabela DimProduct onde a cor do produto pode ser igual a preto ou vermelho, mas a marca deve ser obrigatoriamente igual à "Fabrikam'
+-- Atenção aos Parênteses:
+
+SELECT * FROM DimProduct
+WHERE (ColorName = 'Black' OR ColorName = 'Red') AND BrandName = 'Fabrikam'
+
+-- COMANDO IN - simplifica a vizualização em casos que em tese se usaria muito o booleano OR.
+
+SELECT * FROM DimProduct
+
+WHERE ColorName IN ('Silver', 'Blue', 'White', 'Red', 'Black')
+
+
+SELECT * FROM DimEmployee
+WHERE DepartmentName IN ('Production', 'Marketing', 'Engenieering')

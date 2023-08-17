@@ -1,0 +1,656 @@
+/* MÓDULO 9 - VARIÁVEIS -- TIPOS DE DADOS - CAST E FORMAT - ROUND, FLOOR E CEILING - DECLARE E SET - APLICAÇÕES DE VARIÁVEIS - PRINT - VARIÁVEIS
+GLOBAIS */
+
+/* TIPOS DE DADOS:
+
+O tipo de dado é a maneira como o SQL consegue diferenciar cada valor dentro de um BD.
+
+A) Inteiro: 1, 100, 50, 999...
+
+O SQL entende o dado inteiro como INT.
+
+B) Decimal: 10.33, 90.91, 410.787
+
+O SQL entende o decimal como FLOAT
+O SQL entende o decimal também como: DECIMAL(M, N)
+
+N é o número de dígitos que o número pode ter, incluindo as casas decimais.
+M é o número máximo de casas decimais.
+
+C) Tipo texto/string: 'Carla', 'Motorola' '44', 'Pastel'
+
+Como o SQL entende um texto: VARCHAR(50)
+N, acima representado pelo número (50), é o número de carcteres que o texto pode ter.
+
+D) Data: '01/01/2021', '23/03/20'
+
+Como o SQL entende uma data: DATETIME */
+
+-- Operações Básicas
+
+SELECT 'MARCOS' AS 'TESTE', 10 + 10 AS 'TESTE_SOMA', '21/09/12' AS 'TESTE_DATA'
+
+SELECT 10 * 20 AS 'MULTIPLICAÇÃO'
+SELECT 431/23 AS 'DIVISÃO' -- RETORNA A PARTE INTEIRA DA DIVISÃO
+SELECT 431.0/23.0
+
+-- OPERAÇÕES COM TEXTOS
+
+SELECT 'VITOR' + ' CAMPOS'
+
+-- SQL_VARIANT_PROPERTY - PERMITE IDENTIFICAR O TIPO DE DADO
+
+-- EX:
+
+SELECT 10 AS 'NÚMERO'
+
+SELECT SQL_VARIANT_PROPERTY(10, 'BaseType') AS 'TIPO DE DADO'
+
+-- CAST: FUNÇÃO PARA ESPECIFICAR O TIPO DE DADO E DECLARAÇÃO DE VARIÁVEIS
+
+SELECT SQL_VARIANT_PROPERTY(CAST(21.45 AS INT), 'BaseType')
+
+SELECT CAST(21.45 AS INT)
+SELECT CAST(21.45 AS FLOAT)
+SELECT CAST(18.7 AS FLOAT)
+SELECT CAST('15.6' AS FLOAT)
+SELECT CAST('20/06/2021' AS DATETIME)
+
+-- EXERCÍCIO 1: crie uma consulta Juntando o texto 'O preço do produto é': ' com o valor 30.99'
+SELECT 'O preço do produto é: ' + CAST(30.99 AS VARCHAR(50))
+
+-- EXERCÍCIO 2 - ADICIONE 1 À DATA '20/06/2021'
+SELECT CAST('20/06/2021' AS DATETIME) + 1
+
+-- 3) FUNÇÃO FORMAT - FORMATAÇÃO DE VALORES NO SQL
+
+-- A) NUMÉRICOS:
+
+--ESTRUTURA: SELECT FORMAT(VALOR, FORMATO)
+SELECT FORMAT(1000, 'N') -- N: NUMBER
+SELECT FORMAT(1000, 'G') -- G: GENERAL
+
+-- B) PERSONALIZADOS:
+SELECT FORMAT(123456789, '###-##-####')
+
+-- C) DATA:
+SELECT FORMAT(CAST('21/03/2021' AS DATETIME), 'dd/MM/yyyy')
+SELECT FORMAT(CAST('21/05/2021' AS DATETIME), 'dd/MMMM/yyyy')
+SELECT FORMAT(CAST('21/03/2021' AS DATETIME), 'dddd/MMMM/yyyy')
+
+--EXERCÍCIO 3 - CRIE UMA CONSULTA JUNTANDO O TEXTO 'A DATA DE VALIDADE DO PRODUTO É:' '17/ABR/2022'. OBS: VC DEVERÁ USAR O CAST PARA GARANTIR
+-- QUE A DATA É ENTENDIDA COM O TIPO DATETIME
+
+SELECT 'A validade do produto é: ' + FORMAT(CAST('17/04/2022' AS DATETIME), 'dd/MMM/yyyy')
+
+-- FUNÇÕES DE ARREDONDAMENTO - ROUND - FLOOR - CEILING
+
+SELECT 431.0/23
+SELECT ROUND(18.739130, 2)
+
+SELECT ROUND(18.739130, 2, 1)
+
+SELECT FLOOR(18.739130) -- ARREDONDA PARA BAIXO
+
+SELECT CEILING(18.739130) -- ARREDONDA PARA CIMA
+
+/* DECLARANDO VARIÁVEIS - UMA VARIÁVEL É UM OBJETO QUE ARMAZENA O VALOR DE UM DADO. ESTRUTURA: DECLARE @var Tipo - SET @var = valor - SELECT @var
+
+EXEMPLO:
+
+EM VEZ DE...
+
+SELECT 1000
+SELECT 1000 * 1000
+SELECT FORMAT(1000 * 1000, 'N')
+
+SERIA MELHOR:
+DECLARE @NUMERO FLOAT
+
+SET @NUMERO = 1000
+SELECT @NUMERO
+SELECT @NUMERO * @NUMERO
+SELECT FORMAT(@NUMERO * @NUMERO, 'N')
+
+EXEMPLO PRÁTICO: */
+
+DECLARE @idade INT
+SET @idade = 30
+SELECT @idade AS 'IDADE'
+
+-- EXEMPLO 2 - DECLARE UMA VARIÁVEL CHAMADA PREÇO E ARMAZENE O VALOR 10.89
+
+DECLARE @preco FLOAT
+SET @preco = 10.99
+SELECT @preco AS 'PREÇO'
+
+-- EXEMPLO 3 - DECLARE UMA VARIÁVEL CHAMADA NOME E ARMAZENE UM VALOR 'STRING' DE SUA PREFERENCIA E ESCOLHA
+
+DECLARE @nome VARCHAR(15)
+SET @nome = 'Vitor Campos'
+SELECT @nome AS 'NOME'
+
+-- EXEMPLO 4 - DECLARE UMA VARIÁVEL DATA E ARMAZENE A DATA DE HOJE:
+
+DECLARE @data DATE
+SET @data = '01/03/2023'
+SELECT @data AS 'DATA_HOJE'
+
+-- COMO DECLARAR MAIS DE UMA VARIÁVEL:
+
+-- OPÇÃO 1:
+
+DECLARE @var1 INT
+DECLARE @texto VARCHAR(30)
+DECLARE @data DATETIME
+
+SET @var1 = 10
+SET @texto = 'Vitor'
+SET @data = '23/03/2023'
+
+SELECT @var1, @texto, @data
+
+
+-- COMO DECLARAR MAIS DE UMA VARIÁVEL:
+
+-- OPÇÃO 1:
+
+DECLARE @var1 INT
+DECLARE @texto VARCHAR(10)
+DECLARE @data DATETIME
+
+SET @var1 = 10
+SET @texto = 'Vitor'
+SET @data = '23/03/2023'
+
+SELECT @var1, @texto, @data
+
+-- OPÇÃO 2
+
+DECLARE	@var1 INT,
+		@texto VARCHAR(10),
+		@data DATE
+
+SET @var1 = 10
+SET @texto = 'String'
+SET @data = '01/03/2023'
+
+SELECT @var1, @texto, @data
+
+-- OPÇÃO 3
+
+DECLARE @var1 INT = 10,
+		@texto VARCHAR(10) = 'String',
+		@data DATE = '01/03/2023'
+		
+SELECT @var1, @texto, @data
+
+/* EXERCÍCIO - A SUA LOJA FEZ UMA VENDA DE 100 CAMISAS CADA UMA CUSTANDO 89.99. FAÇA UM SELECT PARA OBTER O RESULTADO DO FATURAMENTO (MULTIPLICAÇÃO
+DA QUANTIDADE X O PREÇO). */
+
+SELECT 100 * 89.99 AS 'FATURAMENTO'
+
+-- EXERCÍCIO 2 - REFAÇA O EXERCÍCIO ANTERIOR UTILIZANDO VARIÁVEIS PARA DEIXAR O CÁLCULO MAIS OTIMIZADO:
+
+DECLARE	@PRECO FLOAT = 89.99,
+		@QUANTIDADE INT = 100
+SELECT @PRECO * @QUANTIDADE AS 'FATURAMENTO'
+
+-- UTILIZANDO UMA VARIÁVEL EM UMA CONSULTA (EXEMPLOS)
+-- EXEMPLO 1: APLIQUE UM DESCONTO DE 10% EM TODOS OS PREÇOS DOS PRODUTOS. SUA CONSULTA FINAL DEVE CONTER AS COLUNAS ProductKey, UnitPrice e Preço com Desconto
+
+DECLARE	@vardesconto FLOAT = 0.10
+
+SELECT	ProductKey AS 'ID',
+		ProductName AS 'PRODUTO',
+		UnitPrice AS 'PREÇO UNITÁRIO',
+		UnitPrice * (1 - @vardesconto) AS 'PREÇO_COM_DESCONTO)'
+FROM
+	DimProduct
+		
+
+-- EXEMPLO 2 - UTILIZANDO UMA VARIÁVEL EM UMA CONSULTA - CRIE UMA VARIÁVEL DE DATA PARA OTIMIZAR A CONSULTA ABAIXO
+
+DECLARE @vardata DATE = '01/01/1980'
+
+SELECT
+	FirstName AS 'NOME',
+	LastName AS 'SOBRENOME',
+	BirthDate AS 'NASCIMENTO',
+	'CLIENTE' AS 'TIPO'
+FROM
+	DimCustomer
+WHERE BirthDate >= @vardata
+
+UNION
+
+SELECT
+	FirstName AS 'NOME',
+	LastName AS 'SOBRENOME',
+	BirthDate AS 'NASCIMENTO',
+	'FUNCIONÁRIO' AS 'TIPO'
+FROM
+	DimEmployee
+WHERE BirthDate >= @vardata
+ORDER BY NASCIMENTO
+
+-- COMO DECLARAR MAIS DE UMA VARIÁVEL:
+
+-- OPÇÃO 1:
+
+DECLARE @var1 INT
+DECLARE @texto VARCHAR(10)
+DECLARE @data DATETIME
+
+SET @var1 = 10
+SET @texto = 'Vitor'
+SET @data = '23/03/2023'
+
+SELECT @var1, @texto, @data
+
+-- OPÇÃO 2
+
+DECLARE	@var1 INT,
+		@texto VARCHAR(10),
+		@data DATE
+
+SET @var1 = 10
+SET @texto = 'String'
+SET @data = '01/03/2023'
+
+SELECT @var1, @texto, @data
+
+-- OPÇÃO 3
+
+DECLARE @var1 INT = 10,
+		@texto VARCHAR(10) = 'String',
+		@data DATE = '01/03/2023'
+		
+SELECT @var1, @texto, @data
+
+/* EXERCÍCIO - A SUA LOJA FEZ UMA VENDA DE 100 CAMISAS CADA UMA CUSTANDO 89.99. FAÇA UM SELECT PARA OBTER O RESULTADO DO FATURAMENTO (MULTIPLICAÇÃO
+DA QUANTIDADE X O PREÇO). */
+
+SELECT 100 * 89.99 AS 'FATURAMENTO'
+
+-- EXERCÍCIO 2 - REFAÇA O EXERCÍCIO ANTERIOR UTILIZANDO VARIÁVEIS PARA DEIXAR O CÁLCULO MAIS OTIMIZADO:
+
+DECLARE	@PRECO FLOAT = 89.99,
+		@QUANTIDADE INT = 100
+SELECT @PRECO * @QUANTIDADE AS 'FATURAMENTO'
+
+-- UTILIZANDO UMA VARIÁVEL EM UMA CONSULTA (EXEMPLOS)
+-- EXEMPLO 1: APLIQUE UM DESCONTO DE 10% EM TODOS OS PREÇOS DOS PRODUTOS. SUA CONSULTA FINAL DEVE CONTER AS COLUNAS ProductKey, UnitPrice e Preço com Desconto
+
+DECLARE	@vardesconto FLOAT = 0.10
+
+SELECT	ProductKey AS 'ID',
+		ProductName AS 'PRODUTO',
+		UnitPrice AS 'PREÇO UNITÁRIO',
+		UnitPrice * (1 - @vardesconto) AS 'PREÇO_COM_DESCONTO)'
+FROM
+	DimProduct
+		
+
+-- EXEMPLO 2 - UTILIZANDO UMA VARIÁVEL EM UMA CONSULTA - CRIE UMA VARIÁVEL DE DATA PARA OTIMIZAR A CONSULTA ABAIXO
+
+DECLARE @vardata DATE = '01/01/1980'
+
+SELECT
+	FirstName AS 'NOME',
+	LastName AS 'SOBRENOME',
+	BirthDate AS 'NASCIMENTO',
+	'CLIENTE' AS 'TIPO'
+FROM
+	DimCustomer
+WHERE BirthDate >= @vardata
+
+UNION
+
+SELECT
+	FirstName AS 'NOME',
+	LastName AS 'SOBRENOME',
+	BirthDate AS 'NASCIMENTO',
+	'FUNCIONÁRIO' AS 'TIPO'
+FROM
+	DimEmployee
+WHERE BirthDate >= @vardata
+ORDER BY NASCIMENTO
+
+-- COMO ARMAZENAR O RESULTADO DE UM SELECT DENTRO DE UMA VARIÁVEL. EXEMPLO 1:
+--CRIE UMA VARIÁVEL PARA ARMAZENAR A QUANTIDADE TOTAL DE FUNCIONÁRIOS DA TABELA DimEmployee:
+
+SELECT * FROM DimEmployee
+
+SELECT
+	COUNT(FirstName) AS 'NOME'
+FROM DimEmployee
+
+DECLARE @varTotalFunc INT = (SELECT COUNT(FirstName) AS 'NOME' FROM DimEmployee)
+
+SELECT @varTotalFunc
+
+-- EXEMPLO 2: CRIE UMA VARIÁVEL PARA ARMAZENAR A QTD TOTAL DE LOJAS COM O STATUS OFF
+
+SELECT * FROM DimStore
+
+SELECT COUNT(*) FROM DimStore WHERE Status = 'Off'
+
+DECLARE @varStatusOff INT = (SELECT COUNT(*) FROM DimStore WHERE Status = 'Off')
+
+SELECT @varStatusOff AS 'LOJAS OFF'
+
+-- COMANDO PRINT - PARA PRINTAR AVISOS NA TELA
+
+SET NOCOUNT ON -- RETIRA AS CONTAGENS PARA AS CONSULTAS
+
+-- EXEMPLO 1 - PRINTE NA TELA A QUANTIDADE DE LOJAS ON E A QUANTIDADE DE LOJAS OFF DA TABELA DIMSTORE. UTILIZE VARIÁVEIS PARA ISSO
+
+SELECT * FROM DimStore
+
+DECLARE
+	@varon INT = (SELECT COUNT (*) FROM DimStore WHERE Status = 'On'),
+	@varoff INT = (SELECT COUNT (*) FROM DimStore WHERE Status = 'Off')
+
+SELECT	@varon AS 'LOJAS_ON',
+		@varoff AS 'LOJAS_OFF'
+
+PRINT 'O total de lojas abertas é de: ' + CAST(@varon AS VARCHAR(30))
+PRINT 'O total de lojas fechadas é de: ' + CAST(@varoff AS VARCHAR(30))
+		
+
+-- ARMAZENANDO EM UMA VARIÁVEL UM REGISTRO DE UMA CONSULTA
+
+SELECT TOP(100) * FROM FactSales
+SELECT * FROM DimProduct
+
+-- EXEMPLO 1 - QUAL É O NOME DO PRODUTO QUE TEVE A MAIOR QUANTIDADE VENDIDA EM UMA ÚNICA VENDA DA TABELA FACTSALES
+
+DECLARE	@varProdutoMaisVendido INT,
+		@varTotalMaisVendido INT
+
+SELECT TOP(1)
+	@varProdutoMaisVendido = ProductKey,
+	@varTotalMaisVendido = SalesQuantity
+FROM
+	FactSales
+ORDER BY SalesQuantity DESC
+
+PRINT 'O produto mais vendido possui a chave: ' + CAST(@varProdutoMaisVendido AS VARCHAR(10))
+PRINT 'A quantidade dele vendida é: ' + CAST(@varTotalMaisVendido AS VARCHAR(10))
+
+
+SELECT
+	ProductKey,
+	ProductName
+FROM
+	DimProduct
+WHERE ProductKey = @varProdutoMaisVendido
+
+-- COMANDO PRINT - PARA PRINTAR AVISOS NA TELA
+
+SET NOCOUNT ON -- RETIRA AS CONTAGENS PARA AS CONSULTAS
+
+-- EXEMPLO 1 - PRINTE NA TELA A QUANTIDADE DE LOJAS ON E A QUANTIDADE DE LOJAS OFF DA TABELA DIMSTORE. UTILIZE VARIÁVEIS PARA ISSO
+
+SELECT * FROM DimStore
+
+DECLARE
+	@varon INT = (SELECT COUNT (*) FROM DimStore WHERE Status = 'On'),
+	@varoff INT = (SELECT COUNT (*) FROM DimStore WHERE Status = 'Off')
+
+SELECT	@varon AS 'LOJAS_ON',
+		@varoff AS 'LOJAS_OFF'
+
+PRINT 'O total de lojas abertas é de: ' + CAST(@varon AS VARCHAR(30))
+PRINT 'O total de lojas fechadas é de: ' + CAST(@varoff AS VARCHAR(30))
+		
+
+-- ARMAZENANDO EM UMA VARIÁVEL UM REGISTRO DE UMA CONSULTA
+
+SELECT TOP(100) * FROM FactSales
+SELECT * FROM DimProduct
+
+-- EXEMPLO 1 - QUAL É O NOME DO PRODUTO QUE TEVE A MAIOR QUANTIDADE VENDIDA EM UMA ÚNICA VENDA DA TABELA FACTSALES
+
+DECLARE	@varProdutoMaisVendido INT,
+		@varTotalMaisVendido INT
+
+SELECT TOP(1)
+	@varProdutoMaisVendido = ProductKey,
+	@varTotalMaisVendido = SalesQuantity
+FROM
+	FactSales
+ORDER BY SalesQuantity DESC
+
+PRINT 'O produto mais vendido possui a chave: ' + CAST(@varProdutoMaisVendido AS VARCHAR(10))
+PRINT 'A quantidade dele vendida é: ' + CAST(@varTotalMaisVendido AS VARCHAR(10))
+
+
+SELECT
+	ProductKey,
+	ProductName
+FROM
+	DimProduct
+WHERE ProductKey = @varProdutoMaisVendido
+
+-- ACUMULANDO VALORES DENTRO DE UMA VARIÁVEL
+-- EX: PRINTE NA TABELA UMA LISTA COM OS NOMES DAS FUNCIONÁRIAS DO DEPARTAMENTO DE MARKETING
+
+SELECT
+	FirstName,
+	DepartmentName
+FROM
+	DimEmployee
+WHERE DepartmentName = 'Marketing' and Gender = 'F'
+
+-- SOLUÇÃO
+
+DECLARE
+	@varlistanomes VARCHAR(50) = ''
+
+SELECT
+	@varlistanomes = @varlistanomes + FirstName + ', ' + CHAR(10)
+FROM
+	DimEmployee
+WHERE DepartmentName = 'Marketing' AND Gender = 'F'
+
+PRINT LEFT(@varlistanomes, DATALENGTH(@varlistanomes) - 3)
+
+-- VARIÁVEIS GLOBAIS
+
+SELECT @@SERVERNAME
+
+SELECT @@VERSION
+
+SELECT * FROM DimProduct
+SELECT @@ROWCOUNT
+
+-- EXERCÍCIOS DE FIXAÇÃO:
+
+/* 1 Declare 4 variáveis inteiras. Atribua os seguintes valores a elas:
+valor1 = 10
+valor2 = 5
+valor3 = 34
+valor4 = 7 */
+
+DECLARE
+	@varValor1 INT = 10,
+	@varValor2 INT = 5,
+	@varValor3 INT = 34,
+	@varValor4 INT = 7
+
+/*a) Crie uma nova variável para armazenar o resultado da soma entre valor1 e valor2. Chame
+essa variável de soma. */
+
+DECLARE @varSoma INT = (SELECT @varValor1 + @varValor2)
+SELECT @varSoma
+
+/* b) Crie uma nova variável para armazenar o resultado da subtração entre valor3 e valor 4.
+Chame essa variável de subtracao. */
+
+DECLARE
+	@varValor1 INT = 10,
+	@varValor2 INT = 5,
+	@varValor3 INT = 34,
+	@varValor4 INT = 7
+
+DECLARE @subtração INT = (SELECT @varValor3 - @varValor4)
+SELECT @subtração
+
+/* c) Crie uma nova variável para armazenar o resultado da multiplicação entre o valor 1 e o
+valor4. Chame essa variável de multiplicacao. */
+
+DECLARE
+	@varValor1 INT = 10,
+	@varValor2 INT = 5,
+	@varValor3 INT = 34,
+	@varValor4 INT = 7
+
+DECLARE @Multiplicação INT = (SELECT @varValor1 * @varValor4)
+SELECT @Multiplicação
+
+/* d) Crie uma nova variável para armazenar o resultado da divisão do valor3 pelo valor4. Chame
+essa variável de divisao. Obs: O resultado deverá estar em decimal, e não em inteiro. */
+
+DECLARE
+	@varValor1 INT = 10,
+	@varValor2 INT = 5,
+	@varValor3 float = 34,
+	@varValor4 float = 7
+
+
+DECLARE @divisão float = @varValor3 / @varValor4
+
+SELECT @divisão
+SELECT ROUND(@divisão, 2)
+
+/* 2. Para cada declaração das variáveis abaixo, atenção em relação ao tipo de dado que deverá ser
+especificado. a) Declare uma variável chamada ‘produto’ e atribua o valor de ‘Celular’.
+b) Declare uma variável chamada ‘quantidade’ e atribua o valor de 12.
+c) Declare uma variável chamada ‘preco’ e atribua o valor 9.99.
+d) Declare uma variável chamada ‘faturamento’ e atribua o resultado da multiplicação entre
+‘quantidade’ e ‘preco’.
+e) Visualize o resultado dessas 4 variáveis em uma única consulta, por meio do SELECT. */
+
+
+DECLARE
+    @produto VARCHAR(15) = 'Celular',
+    @quantidade INT = 12,
+    @preco FLOAT = 9.99
+
+DECLARE @varfaturamento FLOAT = (SELECT @quantidade * @preco)
+
+SELECT
+    @produto AS 'PRODUTO',
+    @quantidade AS 'QUANTIDADE',
+    @preco AS 'PREÇO',
+    @varfaturamento AS 'FATURAMENTO'
+
+PRINT 'O PRODUTO É: ' + @produto
+PRINT 'A QUANTIDADE DO PRODUTO É: ' + CAST(@quantidade AS VARCHAR(15))
+PRINT 'O PREÇO DO PRODUTO É: ' + CAST(@preco AS VARCHAR(15))
+PRINT 'O FATURAMENTO DAS VENDAS É: ' + CAST(@varfaturamento AS VARCHAR(15))
+
+
+/* 3. Você é responsável por gerenciar um banco de dados onde são recebidos dados externos de
+usuários. Em resumo, esses dados são:
+- Nome do usuário
+- Data de nascimento
+- Quantidade de pets que aquele usuário possui
+Você precisará criar um código em SQL capaz de juntar as informações fornecidas por este
+usuário. Para simular estes dados, crie 3 variáveis, chamadas: nome, data_nascimento e
+num_pets. Você deverá armazenar os valores ‘André’, ‘10/02/1998’ e 2, respectivamente.
+Dica: você precisará utilizar as funções CAST e FORMAT para chegar no resultado */
+
+DECLARE
+	@nome VARCHAR(15) = 'André',
+	@data_nascimento DATE = '10/02/1998',
+	@num_pets INT = 2
+
+DECLARE @varprint Varchar(60) = (SELECT 'Meu nome é ' + @nome + ', ' + 'nasci em ' + FORMAT(CAST(@data_nascimento  AS DATE), 'dd/MM/yyyy') + ' e tenho ' + CAST(@num_pets AS VARCHAR(2)) + ' pets.')
+
+SELECT @varprint AS 'FRASE EXERCÍCIO'
+
+
+/* 4. Você acabou de ser promovido e o seu papel será realizar um controle de qualidade sobre as
+lojas da empresa.
+A primeira informação que é passada a você é que o ano de 2008 foi bem complicado para a
+empresa, pois foi quando duas das principais lojas fecharam. O seu primeiro desafio é descobrir
+o nome dessas lojas que fecharam no ano de 2008, para que você possa entender o motivo e
+mapear planos de ação para evitar que outras lojas importantes tomem o mesmo caminho.
+O seu resultado deverá estar estruturado em uma frase, com a seguinte estrutura:
+‘As lojas fechadas no ano de 2008 foram: ’ + nome_das_lojas
+Obs: utilize o comando PRINT (e não o SELECT!) para mostrar o resultado. */
+
+SELECT * FROM DimStore
+SELECT TOP(100) * FROM FactOnlineSales
+
+SELECT StoreName, CloseDate FROM DimStore
+WHERE Status = 'Off'
+
+SELECT StoreName, CloseDate FROM DimStore
+WHERE FORMAT(CloseDate, 'yyyy') = 2008
+
+-- SOLUÇÃO
+
+DECLARE @varlistaloja varchar(50) = ''
+
+SELECT
+	@varlistaloja =  @varlistaloja + StoreName + ', '
+FROM
+	DimStore
+WHERE FORMAT(CloseDate, 'yyyy') = 2008
+
+PRINT 'As lojas fechadas em 2008 foram: ' + @varlistaloja
+
+/* 5. Você precisa criar uma consulta para mostrar a lista de produtos da tabela DimProduct para
+uma subcategoria específica: ‘Lamps’.
+Utilize o conceito de variáveis para chegar neste resultado. */
+
+SELECT * FROM DimProduct
+SELECT * FROM DimProductSubcategory
+
+SELECT
+	ProductDescription,
+	ProductSubcategoryDescription
+FROM
+	DimProduct
+INNER JOIN DimProductSubcategory
+	ON DimProduct.ProductSubcategoryKey = DimProductSubcategory.ProductSubcategoryKey
+WHERE ProductSubcategoryDescription = 'Lamps'
+
+
+
+-- SOLUÇÃO
+
+SELECT * FROM DimProduct
+SELECT * FROM DimProductSubcategory
+
+DECLARE @varlistaloja1 varchar(50) = 'Lamps'
+SELECT
+	ProductDescription,
+	ProductSubcategoryDescription
+FROM
+	DimProduct
+INNER JOIN DimProductSubcategory
+	ON DimProduct.ProductSubcategoryKey = DimProductSubcategory.ProductSubcategoryKey
+WHERE ProductSubcategoryDescription = @varlistaloja1
+
+
+
+DECLARE @varIdSubcategoria INT
+DECLARE @varNomeSubcategoria VARCHAR(30)
+
+SET @varNomeSubcategoria = 'Lamps'
+SET @varIdSubcategoria = (SELECT ProductSubcategoryKey FROM DimProductSubcategory WHERE ProductSubcategoryName = @VarNomeSubcategoria)
+
+
+SELECT
+	*
+FROM DimProduct
+WHERE ProductSubcategoryKey = @varIDsubcategoria
+
+
+
+

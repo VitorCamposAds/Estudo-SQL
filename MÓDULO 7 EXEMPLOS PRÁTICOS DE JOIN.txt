@@ -1,0 +1,176 @@
+-- INNER, LEFT AND RIGHT JOIN
+
+
+CREATE DATABASE JOINS -- CRIA UM DB NOVO
+GO
+USE JOINS -- SELECIONA O BD ONDE VAMOS ADD TABELAS
+
+CREATE TABLE produtos(
+id_produto int,
+nome_produto varchar(30),
+MÓDULO 7 CRIAÇÃO DE TABELAS FICTÍCIAS PARA EXEMPLOS DE JOIN
+
+id_subcategoria int)
+
+INSERT INTO produtos(id_produto, nome_produto, id_subcategoria)
+VALUES
+(1, 'Fone Bluetooh JBL', 5),
+(2, 'PS4', 6),
+(3, 'Notebook Samsumg i3', 2),
+(4, 'Iphone 11', 1),
+(5, 'Moto G9', 1)
+
+
+
+CREATE TABLE subcategoria(
+id_subcategoria INT, 
+nome_subcategoria VARCHAR(30))
+INSERT INTO subcategoria(id_subcategoria, nome_subcategoria)
+VALUES
+(1, 'Celular'),
+(2, 'Notebook'),
+(3, 'Câmera Digital'),
+(4, 'Televisão'),
+(5, 'Fone de Ouvido')
+
+-- EXEMPLO DE LEFT (OUTER) JOIN:
+
+SELECT * FROM produtos
+SELECT * FROM subcategoria
+
+SELECT
+	produtos.id_produto,
+	produtos.nome_produto,
+	produtos.id_subcategoria,
+	subcategoria.nome_subcategoria
+FROM
+	produtos
+LEFT JOIN subcategoria
+	ON produtos.id_subcategoria = subcategoria.id_subcategoria
+
+-- EXEMPLO DE RIGHT (OUTER) JOIN
+
+SELECT * FROM produtos
+SELECT * FROM subcategoria
+
+SELECT
+	produtos.id_produto,
+	produtos.nome_produto,
+	produtos.id_subcategoria,
+	subcategoria.nome_subcategoria
+FROM
+	produtos
+RIGHT JOIN subcategoria
+	ON produtos.id_subcategoria = subcategoria.id_subcategoria
+
+-- EXEMPLO INNER JOIN:
+
+SELECT
+	id_produto,
+	nome_produto,
+	produtos.id_subcategoria,
+	nome_subcategoria
+FROM
+	produtos
+INNER JOIN subcategoria
+	ON produtos.id_subcategoria = subcategoria.id_subcategoria
+
+-- FULL (OUTER) JOIN
+
+SELECT
+	id_produto,
+	nome_produto,
+	produtos.id_subcategoria,
+	nome_subcategoria
+FROM
+	produtos
+FULL JOIN subcategoria
+	ON produtos.id_subcategoria = subcategoria.id_subcategoria
+
+-- LEFT (ANTI) JOIN
+
+SELECT
+	id_produto,
+	nome_produto,
+	produtos.id_subcategoria,
+	nome_subcategoria
+FROM
+	produtos
+LEFT JOIN subcategoria
+	ON produtos.id_subcategoria = subcategoria.id_subcategoria
+WHERE nome_subcategoria IS NULL
+
+-- RIGHT ANTI JOIN
+
+SELECT
+	id_produto,
+	nome_produto,
+	produtos.id_subcategoria,
+	nome_subcategoria
+FROM
+	produtos
+RIGHT JOIN subcategoria
+	ON produtos.id_subcategoria = subcategoria.id_subcategoria
+WHERE id_produto IS NULL
+
+-- FULL (ANTI) JOIN
+
+SELECT
+	id_produto,
+	nome_produto,
+	produtos.id_subcategoria,
+	nome_subcategoria
+FROM
+	produtos
+FULL JOIN subcategoria
+	ON produtos.id_subcategoria = subcategoria.id_subcategoria
+WHERE id_produto IS NULL OR nome_subcategoria IS NULL
+
+-- COMO ESCOLHER QUAL TABELA É DA ESQUERDA E QUAL TABELA É DA DIREITA?
+
+-- 1. LEFT JOIN PARA COMPLEMENTAR INFORMAÇÕES DA TABELA DE PRODUTOS (LEFT) DE ACORDO COM A TABELA DE CATEGORIA (RIGHT) - TABELA JOINS
+
+SELECT
+	id_produto,
+	nome_produto,
+	produtos.id_subcategoria,
+	nome_subcategoria
+FROM
+	produtos
+LEFT JOIN subcategoria
+	ON produtos.id_subcategoria = subcategoria.id_subcategoria
+
+-- 2. OBTENDO O LEFT JOIN DO CASO ACIMA USANDO RIGHT JOIN E INVERTENDO AS TABELAS DE LADO
+
+SELECT
+	id_produto,
+	nome_produto,
+	produtos.id_subcategoria,
+	nome_subcategoria
+FROM
+	subcategoria
+RIGHT JOIN produtos
+	ON  subcategoria.id_subcategoria = produtos.id_subcategoria
+
+-- OBS: NA PRÁTICA O RESULTADO É O MESMO!
+
+-- EXEMPLO DE CROSSJOIN
+
+CREATE TABLE marcas(
+id_marca int,
+marca varchar(20))
+INSERT INTO marcas(id_marca, marca)
+VALUES
+(1, 'Apple'),
+(2, 'Samsung'),
+(3, 'Motorola')
+
+
+SELECT * FROM marcas
+SELECT * FROM subcategoria
+
+SELECT
+	marca,
+	nome_subcategoria
+FROM
+	marcas CROSS JOIN subcategoria

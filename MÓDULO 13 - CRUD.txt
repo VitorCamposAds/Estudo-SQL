@@ -1,0 +1,161 @@
+-- MÓDULO 13
+
+/* CRUD - O QUE É CRUD? - CREATE/DROP DATABASE - INSERT SELECT - INSERT INTO - UPDATE - DELETE - DROP TABLE - ALTER TABLE
+
+CRUD - CRIAÇÃO, LEITURA, ALTERAÇÃO/ATUALIZAÇÃO E EXCLUSÃO DE BD E TABLEAS (CREATE - READ - UPDATE - DELETE */
+
+-- CRIANDO E EXCLUINDO BD
+CREATE DATABASE BDImpressionador
+-- DROP DATABASE xxxxxx
+
+
+-- CREATE - Criar uma Tabela - cada coluna da tabela deve ter um tipo, uma lógica (Tabela estruturada). Cada coluna tem o mesmo tipo de dado.
+-- Exemplo: coluna de ID (tipo: numero) - coluna de data(Datetime) Renda Anual (Float) etc.
+
+-- Estrutura:
+GO
+CREATE TABLE Produtos(
+	id_produto INT,
+	nome_produto varchar(50),
+	data_validade datetime,
+	preco_produto float
+)
+GO
+-- INSERT - PARA ADICIONAR INFOS:
+INSERT INTO Produtos(id_produto, nome_produto, data_validade, preco_produto)
+VALUES
+	(1, 'Arroz', 2021-12-31, 22.50),
+	(2, 'Feijão', 2021-12-31, 8.99)
+
+-- COMO ATUALIZAR INFOS NO BD - UPDATE
+UPDATE Produtos
+SET nome_produto = 'Macarrão'
+WHERE id_produto = 3
+
+-- DELETE
+
+DELETE
+FROM Produtos
+WHERE id_produto = 3
+
+DROP TABLE Produtos
+
+-- Cuidados antes de criar a tabela - Veja e atente-se o BD selecionado, para garantir que não terá problemas.
+
+USE BDImpressionador
+
+-- PRÁTICA - CRIAR TABELA ESTRUTURA:
+
+-- CREATE TABLE nome_tabela(
+--		Coluna1 TIPO1,
+--		Coluna2 TIPO2,
+--		Coluna3 TIPO3
+)
+
+-- Crie uma tabela chamada Produtos com 4 colunas: id_produto, nome_produto, data_validade e preco_produto.
+-- Certifique-se de que o tipo das colunas está correto.
+
+CREATE TABLE Produtos(
+	id_produto INT,
+	nome_produto VARCHAR(200),
+	data_validade DATETIME,
+	preco_produto FLOAT
+)
+	
+SELECT * FROM Produtos
+
+-- ADICIONAR DADOS À TABELA Produtos. EXISTEM DUAS MANEIRAS DE SE ADICIONAR DADOS À UMA TABELA E UMA DELAS É ADICIONANDO A PARTIR DE UMA OUTRA
+-- TABELA EXISTENTE.
+
+INSERT INTO Produtos(id_produto, nome_produto, data_validade, preco_produto)
+SELECT
+	ProductKey,
+	ProductName,
+	AvailableForSaleDate,
+	UnitPrice
+FROM 
+	ContosoRetailDW.dbo.DimProduct
+
+SELECT * FROM Produtos
+
+DROP TABLE Produtos
+
+-- ADICIONANDO DADOS DO ZERO
+
+INSERT INTO Produtos(id_produto, nome_produto, data_validade, preco_produto)
+VALUES
+	(1, 'Arroz', '31/12/2021', 22.50),
+	(2, 'Feijão', '20/11/2022', 8.99)
+
+--Não faz diferença adicionar valores com a ordem diferente das colunas da tabela, desde que a ordem seja respeitada dentro da ordem de valores
+--do Insert:
+INSERT INTO Produtos(data_validade, id_produto, preco_produto)
+VALUES
+	('31/05/2023', 3, 33.99)
+
+-- UPDATE
+
+UPDATE Produtos
+SET nome_Produto = 'Macarrão'
+WHERE id_produto = 3
+
+-- DELETANDO DADOS DA TABELA
+
+DELETE
+FROM Produtos
+WHERE id_produto = 3
+
+-- DELETANDO UMA TABELA -- PODE CLICAR COM O BOTÃO DIREITO NELA PARA EXCLUÍ-LA MANUALMENTE, OU USAR O COMANDO ABAIXO
+
+DROP TABLE Produtos
+
+-- USAR O CÓDIGO ABAIXO PARA AS DEMAIS AULAS:
+
+USE BDImpressionador
+
+CREATE TABLE Funcionarios(
+	id_funcionarios INT,
+	nome_funcionario VARCHAR(100),
+	salario FLOAT,
+	data_nascimento DATETIME
+)
+
+INSERT INTO Funcionarios(id_funcionarios, nome_funcionario, salario, data_nascimento)
+VALUES
+	(1, 'Lucas', 1500, '20/03/1990'),
+	(2, 'Andressa', 2300, '07/12/1998'),
+	(3, 'Felipe', 4000, '13/02/1993'),
+	(4, 'Marcelo', 7100, '10/04/1993'),
+	(5, 'Carla', 3200, '02/09/1986'),
+	(6, 'Juliana', 5500, '21/01/1989'),
+	(7, 'Mateus', 1900, '02/11/1993'),
+	(8, 'Sandra', 3900, '09/05/1990'),
+	(9, 'André', 1000, '13/03/1994'),
+	(10, 'Júlio', 4700, '05/07/1992')
+
+SELECT * FROM Funcionarios
+
+-- ALTER TABLE - ADICIONAR COLUNAS, ALTERAR TIPO DE DADO DE UMA COLUNA E DELETAR COLUNA
+-- UTILIZE A TABELA Funcionarios mostrada anteriormente.
+
+SELECT * FROM Funcionarios
+
+-- ADICIONAR COLUNA:
+
+ALTER TABLE Funcionarios
+ADD cargo VARCHAR(100), Bonus FLOAT
+
+UPDATE Funcionarios
+SET cargo = 'Analista', Bonus = 0.15
+WHERE id_funcionarios = 1
+
+
+-- ALTERAR O TIPO DE DADO DE UMA COLUNA
+
+ALTER TABLE Funcionarios
+ALTER COLUMN salario INT
+
+-- DELETAR COLUNA
+
+ALTER TABLE Funcionarios
+DROP COLUMN cargo, Bonus

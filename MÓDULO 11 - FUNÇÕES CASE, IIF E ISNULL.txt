@@ -1,0 +1,259 @@
+MÓDULO 11
+
+/* MÓDULO 11 - FUNÇÕES CASE, IIF E ISNULL
+
+Nesse módulo vamos aprender a tratar condições no SQL - CASE WHEN/ELSE - CASE ANINHADO - CASE AND - CASE/OR - CASE ADITIVO - IIF - ISNULL */
+
+-- CASE: A FUNÇÃO CASE PERMITE TRATAR CONDIÇÕES NO SQL. ESTRUTURA:
+
+/*CASE
+		WHEN Teste Lógico THEN 'resultado1'
+		ELSE "resultado2"
+END
+
+ */
+
+ -- Determine a situação do aluno. Média >= 6: aprovado. Caso contrário: reprovado
+ DECLARE @varNota FLOAT
+ SET @varnota = 5
+
+ SELECT
+	CASE
+		WHEN @varnota >= 6 THEN 'APROVADO!'
+		ELSE 'REPROVADO!'
+	END AS 'SITUAÇÃO'
+
+-- A data de vencimento de um produto é no dia 10/03/2022. Faça um teste lógico para verificar se um produto passou da validade ou não.
+
+
+DECLARE @varDataValidade DATETIME = '10/03/2022',
+		@varDataAtual DATETIME = '13/04/2023'
+
+SELECT
+	CASE
+		WHEN @varDataAtual > @varDataValidade THEN 'PRODUTO VENCIDO'
+		ELSE ' NA VALIDADE'
+	END
+
+-- FAÇA UM SELECT DAS COLUNAS CustomerKey,FirstName e Gender na tabela DimCustomer e utilize o CASE PARA CRIAR UMA 4ª COLUNA COM A INFORMAÇÃO DE
+-- 'MASCULINO' OU 'FEMININO'
+
+SELECT	
+	CustomerKey AS 'ID_CLIENTE',
+	FirstName AS 'NOME',
+	GENDER AS 'Sexo',
+	CASE
+		WHEN Gender = 'M' THEN 'MASCULINO'
+		ELSE 'FEMININO'
+	END AS 'SEXO (CASE)'
+FROM
+	DimCustomer
+
+SELECT	
+	CustomerKey AS 'ID_CLIENTE',
+	FirstName AS 'NOME',
+	GENDER AS 'Sexo',
+	CASE
+		WHEN Gender = 'M' THEN 'MASCULINO'
+		WHEN Gender = 'F' THEN 'FEMININO'
+		ELSE 'EMPRESA'
+	END AS 'SEXO (CASE)'
+FROM
+	DimCustomer
+ 
+
+/*CRIE UM CÓDIGO PARA VERIFICAR A NOTA DO ALUNO E DETERMINAR A SITUAÇÃO:
+- APROVADO - NOTA > 6
+- PROVA FINAL: NOTA ENTRE 4 E 6
+- REPROVADO: NOTA ABAIXO DE 4 */
+
+DECLARE @varNota FLOAT = 5.6
+
+SELECT
+CASE
+	WHEN @varNota >= 6 THEN 'APROVADO!'
+	WHEN @varNota >= 4 THEN 'PROVA FINAL!'
+	ELSE 'REPROVADO!'
+END
+
+/* CLASSIFIQUE O PRODUTO DE ACORDO COM O SEU PREÇO:
+-- PREÇO >= 40000: LUXO
+-- PREÇO >= 10000 E PREÇO < 40000: ECONÔMICO
+-- PREÇO < 10000: BÁSICO */
+
+DECLARE @varPreco INT = 5000
+
+SELECT
+CASE
+	WHEN @varPreco >= 40000 THEN 'LUXO'
+	WHEN @varPreco >= 10000 AND @varPreco < 40000 THEN 'ECONÔMICO'
+	ELSE 'BÁSICO'
+END
+
+-- CASE/AND CASE/OR
+-- FAÇA UMA CONSULTA À TABELA DimProduct E RETORNE AS COLUNAS ProductName, BrandName, ColorName, UnitPrice e UMA COLUNA DE PREÇO COM DESCONTO.
+-- A) CASO O PRODUTO SEJA DA MARCA CONTOSO E DA COR RED, O DESCONTO DO PRODUTO SERÁ DE 10%. CASO CONTRÁRIO, NÃO TERÁ NENHUM DESCONTO.
+
+SELECT
+	ProductName,
+	BrandName,
+	ColorName,
+	UnitPrice,
+	CASE
+		WHEN BrandName = 'contoso' and ColorName = 'Red' THEN 0.1
+		ELSE 0
+	END AS 'PREÇO COM DESCONTO'
+FROM
+	DimProduct
+
+
+--B) CASO O PRODUTO SEJA DA MARCA LITWARE OU FABRIKAM, REEBERÁ UM DESCONTO DE 5%. CASO CONTRÁRIO, NÃO TERÁ NENHUM DESCONTO
+
+SELECT
+	ProductName,
+	BrandName,
+	ColorName,
+	UnitPrice,
+	CASE
+		WHEN BrandName = 'Litware' or BrandName = 'Fabrikam' THEN 0.05
+		ELSE 0
+	END AS 'PREÇO COM DESCONTO'
+FROM
+	DimProduct
+ORDER BY 'PREÇO COM DESCONTO' DESC
+
+-- CASE ANINHADO DIMEMPLOYEE
+
+SELECT * FROM DimEmployee
+
+-- 4 CARGOS (TITLE)
+-- SALES GROUP MANAGER
+-- SALES REGION MANAGER
+-- SALES STATE MANAGER
+-- SALES STORE MANAGER
+
+
+-- ASSALARIADO (SalariedFlag)?
+-- SalariedFlag = 0: não é assalariado
+-- SalariedFlag = 1: é assalariado
+
+-- Situação Cálculo do Bônus
+-- Sales Group Manager: se for assalariado, 30%; se não, 20%.
+-- sales Region Manager: 15%
+-- Sales State Manager: 7%
+-- sales Store Manager: 2%
+
+SELECT
+	FirstName,
+	Title,
+	SalariedFlag,
+	CASE
+		WHEN Title = 'Sales Group Manager' THEN
+		CASE
+			WHEN SalariedFlag = 1 THEN 0.3
+			ELSE 0.2
+		END
+		WHEN Title = 'Sales Region Manager' THEN 0.15
+		WHEN Title = 'Sales State Manager' THEN 0.07
+		ELSE 0.02
+	END AS 'BÔNUS'
+FROM
+	DimEmployee
+ORDER BY 'BÔNUS' DESC
+
+-- CASE ADITIVO
+-- OS PRODUTOS DA CATEGORIA 'TV AND VIDEO' TERÃO UM DESCONTO DE 10%
+-- SE ALÉM DE SER DA CATEGORIA 'TV AND VÍDEO', O PRODUTO FOR DA SUBCATGORIA 'TELEVISIONS', RECEBERÁ MAIS DE 5%.
+--TOTAL, 15%
+
+SELECT
+	ProductKey,
+	ProductName,
+	ProductCategoryName,
+	ProductSubcategoryName,
+	UnitPrice,
+	CASE
+		WHEN ProductCategoryName = 'Tv and Video' THEN 0.10
+	ELSE 0
+	END
+	+ 
+	CASE 
+		WHEN ProductSubCategoryName = 'Televisions' THEN 0.05
+		ELSE 0
+	END
+FROM DimProduct
+INNER JOIN DimProductSubcategory
+	ON DimProduct.ProductSubcategoryKey = DimProductSubcategory.ProductSubcategoryKey
+		INNER JOIN DimProductCategory
+			ON DimProductSubcategory.ProductCategoryKey = DimProductCategory.ProductCategoryKey
+
+-- FUNÇÃO IIF: ALTERNATIVA AO CASE
+-- EXEMPLO 1: QUAL É A CATEGORIA DE RISCO DO PROJETO ABAIXO, DE ACORDO COM A SUA NOTA:
+--RISCO ALTO: CLASSIFICADO >= 5
+--RISCO BAIXO: CLASSIFICAÇÃO < 5
+
+Declare @varClassificacao INT = 2
+
+SELECT
+	IIF(@varClassificacao >= 5, 
+	'RISCO ALTO!', 
+	'RISCO BAIXO!')
+
+
+
+-- EXEMPLO 2: CRIE UMA COLUNA ÚNCA DE 'CLIENTE', CONTENDO O NOME DO CLIENTE, SEJA ELE UMA PESSOA OU UMA EMPRESA. TRAGA TAMBÉM A COLUNA 
+-- DE CUSTOMERKEY E CUSTOMERTYPE
+
+SELECT * FROM DimCustomer
+
+SELECT
+	CustomerKey,
+	CustomerType,
+	IIF(
+		CustomerType = 'Person', 
+		FirstName,
+		CompanyName) AS CLIENTE
+FROM
+	DimCustomer
+ORDER BY CustomerType
+
+
+-- IIF COMPOSTO
+
+SELECT * FROM DimProduct
+
+-- EXISTEM 3 TIPOS DE ESTOQUE: HIGH, MID E LOW. FAÇA UM SELECT CONTENDO AS COLUNAS DE ProductKey, ProductName e NOME DO RESPONSÁVEL PELO PRODUTO,
+-- DE ACORDO COM O TIPO DE ESTOQUE. A REGRA DEVERÁ SER A SEGUINTE:
+-- JOÃO É RESPONSÁVEL PELOS PRODUTOS HIGH
+-- MARIA É RESPONSÁVEL PELOS PRODUTOS MID
+-- LUIS É RESPONSÁVEL PELOS PRODUTOS LOW
+
+SELECT
+	ProductKey,
+	ProductName,
+	StockTypeName,
+	IIF(
+		StockTypeName = 'High',
+		'João',
+		IIF(StockTypeName = 'Mid',
+		'Maria',
+		'Luis')
+		) AS 'Responsável'
+FROM
+	DimProduct
+ORDER BY StockTypeName
+
+
+-- ISNULL: TRATANDO VALORES NULOS
+
+SELECT * FROM DimGeography
+
+SELECT
+	GeographyKey,
+	ContinentName,
+	CityName,
+	ISNULL(CityName, 'Local desconhecido')
+FROM
+	DimGeography
+
+

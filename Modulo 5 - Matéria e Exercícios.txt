@@ -1,0 +1,216 @@
+-- MÓDULO 5 - FUNÇOES DE AGREGAÇÃO
+-- Neste módulo vamos aprender sobre fórmulas de agregação no SQL: count - count + distinct - sum - min/max - avg
+
+SELECT
+	TOP(100) *
+FROM
+	FactSales
+
+
+-- Somar total de quantidade vendida - uso da função SUM:
+
+SELECT
+	SUM(SalesQuantity) AS 'TOTAL_VENDIDO',
+	SUM(ReturnQuantity) AS 'TOTAL_DEVOLVIDO'
+FROM
+FactSales
+
+
+-- FUNÇÃO COUNT
+
+SELECT * FROM DimProduct
+
+SELECT
+	COUNT(*) AS 'TOTAL DE PRODUTOS'
+FROM
+	DimProduct
+
+SELECT
+	COUNT(ProductName) AS 'QTD_PRODUTO'
+FROM
+	DimProduct
+
+	-- O COUNT NÃO CONTA O NULL
+SELECT
+	COUNT(Size)
+FROM
+	DimProduct
+
+-- COUNT + DISTINCT
+
+SELECT * FROM DimProduct
+
+SELECT
+	COUNT(DISTINCT ColorName) AS 'CORES_DISTINTAS'
+FROM
+	DimProduct
+
+SELECT
+	COUNT(DISTINCT BrandName) AS 'Nome_da_marca'
+FROM
+	DimProduct
+
+-- MIN E MAX
+
+SELECT * FROM DimProduct
+
+SELECT
+	MAX(UnitPrice)
+FROM
+	DimProduct
+
+SELECT
+	MIN(UnitPrice)
+FROM
+	DimProduct
+
+SELECT
+	MAX(UnitCost) AS 'CUSTO_MÁXIMO',
+	MIN(UnitCost) AS 'CUSTO_MÍNIMO'
+FROM
+	DimProduct
+
+-- AVG - AVERAGE
+
+SELECT * FROM DimCustomer
+
+SELECT
+	AVG(YearlyIncome) AS 'RENDA_ANUAL_MÉDIA'
+FROM
+	DimCustomer
+
+-- EXERCÍCIOS:
+
+/* 1 - 1. O gerente comercial pediu a você uma análise da Quantidade Vendida e Quantidade
+Devolvida para o canal de venda mais importante da empresa: Store.
+Utilize uma função SQL para fazer essas consultas no seu banco de dados. Obs: Faça essa
+análise considerando a tabela FactSales. */
+
+SELECT
+	TOP(100) *
+FROM
+	FactSales
+
+SELECT
+	ChannelKey
+FROM
+	FactSales
+WHERE channelKey = 1
+	
+SELECT
+	SUM(SalesQuantity) AS 'QTD.VENDIDA',
+	SUM(ReturnQuantity) AS 'QTD.DEVOLVIDA'
+FROM
+	FactSales
+WHERE channelKey = 1
+
+
+select * from DimChannel
+
+/* 2. Uma nova ação no setor de Marketing precisará avaliar a média salarial de todos os clientes
+da empresa, mas apenas de ocupação Professional. Utilize um comando SQL para atingir esse
+resultado. */
+
+SELECT * FROM DimCustomer
+
+SELECT
+	AVG(YearlyIncome) AS 'MÉDIA RENDA ANUAL'
+FROM
+	DimCustomer
+WHERE Occupation = 'Professional'
+
+/* 3. Você precisará fazer uma análise da quantidade de funcionários das lojas registradas na
+empresa. O seu gerente te pediu os seguintes números e informações:
+a) Quantos funcionários tem a loja com mais funcionários?
+b) Qual é o nome dessa loja?
+c) Quantos funcionários tem a loja com menos funcionários?
+d) Qual é o nome dessa loja? */
+
+SELECT * FROM DimStore
+
+-- LETRA A
+SELECT
+	MAX(EmployeeCount) AS 'QTD_MAX_FUNCIONÁRIOS'
+FROM
+	DimStore
+
+--LETRA B
+
+SELECT
+	TOP(1) StoreName AS 'NOME DA LOJA',
+	EmployeeCount AS 'QTD_FUNCIONÁRIOS'
+FROM
+	DimStore
+ORDER BY EmployeeCount DESC
+
+-- LETRA C
+
+SELECT
+	MIN(EmployeeCount) AS 'QTD_MIN_FUNCIONÁRIOS'
+FROM
+	DimStore
+
+-- LETRA D
+
+SELECT
+	TOP(1) StoreName AS 'NOME DA LOJA',
+	EmployeeCount AS 'QTD_FUNCIONÁRIOS'
+FROM
+	DimStore
+WHERE EmployeeCount IS NOT NULL
+ORDER BY EmployeeCount
+
+/* 4. A área de RH está com uma nova ação para a empresa, e para isso precisa saber a quantidade
+total de funcionários do sexo Masculino e do sexo Feminino.
+a) Descubra essas duas informações utilizando o SQL.
+b) O funcionário e a funcionária mais antigos receberão uma homenagem. Descubra as
+seguintes informações de cada um deles: Nome, E-mail, Data de Contratação. */
+
+SELECT * FROM DimEmployee
+
+-- A:
+SELECT
+	COUNT(Gender) AS 'GENERO MASCULINO'
+FROM
+	DimEmployee
+WHERE Gender = 'M'
+
+SELECT
+	COUNT(Gender) AS 'GENERO FEMININO'
+FROM
+	DimEmployee
+WHERE Gender = 'F'
+
+-- B
+
+SELECT
+	top(10)
+	Gender,
+	FirstName,
+	LastName,
+	MiddleName,
+	BirthDate,
+	EmailAddress,
+	HireDate
+FROM
+	DimEmployee
+ORDER BY HireDate
+
+/* 5. Agora você precisa fazer uma análise dos produtos. Será necessário descobrir as seguintes
+informações:
+a) Quantidade distinta de cores de produtos.
+b) Quantidade distinta de marcas
+c) Quantidade distinta de classes de produto
+Para simplificar, você pode fazer isso em uma mesma consulta. */
+
+SELECT * FROM DimProduct
+
+
+
+SELECT
+	COUNT(DISTINCT ColorName) AS 'CORES',
+	COUNT(DISTINCT BrandName) AS 'MARCA',
+	COUNT(DISTINCT ClassName) AS 'CLASSE'
+
+FROM
+	DimProduct

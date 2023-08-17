@@ -1,0 +1,81 @@
+MÓDULO 12 - SQL VIEWS - Neste Módulo vamos aprender a criar Views no SQL. </> O que é uma view? - CREATE VIEW -
+ALTER VIEW - DROP VIEW
+ 
+
+Criando a 1ª view - Quando falamos em Views, existem 3 ações envolvidas:
+1 - Criação de uma View
+2 - Alteração de uma View
+3 - Exclusão de uma View
+
+
+Para cada uma dessas ações, temos um comando associado:
+1. CREATE VIEW
+2. ALTER VIEW
+3. DROP VIEW
+
+-- CREATE VIEW
+/* A) Crie uma view contendo as seguintes informações da tabela DimCustomer: FirstName, EmailAddress e BirthDate.
+Chame essa View de vwClientes. */
+
+CREATE VIEW vwCkientes AS
+SELECT
+	FirstName AS 'NOME',
+	EmailAddress AS 'EMAIL',
+	BirthDate AS 'DATA_NASCIMENTO'
+FROM
+	DimCustomer
+GO
+
+SELECT * FROM vwCkientes
+
+/* Crie uma view contendo as seguintes informações da tabela DimProduct: ProductKey, ProductName, ProductSubcategoryKey, BrandName e UnitPrice.
+Chame essa view de "vwProdutos". */
+
+GO
+CREATE VIEW vwProdutos AS
+SELECT
+	ProductKey AS 'ID_PRODUTO',
+	ProductName AS 'NOME_PRODUTO',
+	ProductSubcategoryKey AS 'ID_SUBCATEGORIA',
+	BrandName 'MARCA',
+	UnitPrice AS 'PREÇO_UNITÁRIO'
+FROM
+	DimProduct
+GO
+
+DROP VIEW vwProdutos
+
+DROP VIEW vwCkientes
+
+-- SELECT EM 2 BD DIFERENTES, USA-SE O COMANDO "USE"
+
+USE ContosoRetailDW
+SELECT * FROM DimProduct
+
+-- ATER VIEW
+
+/* A) Altere a view criada no exemplo 1(a) para incluir apenas os clientes do sexo feminino */
+
+SELECT * FROM vwClientes
+
+GO
+ALTER VIEW vwClientes AS
+SELECT
+	FirstName AS 'NOME',
+	EmailAddress AS 'EMAIL',
+	BirthDate AS 'DATA_NASCIMENTO',
+	GENDER AS 'SEXO'
+FROM
+	DimCustomer
+WHERE GENDER = 'F'
+GO
+
+-- DROP VIEW
+
+DROP VIEW vwClientes
+
+
+
+
+
+

@@ -1,0 +1,92 @@
+-- MÓDULO 7 - EXEMPLO BD CONTOSO
+
+-- EXEMPLO DE INNER JOIN, LEFT JOIN E RIGHT JOIN - CONTOSO
+
+SELECT ProductKey, ProductName, ProductSubcategoryKey FROM DimProduct
+SELECT ProductSubcategoryKey, ProductSubcategoryName FROM DimProductSubcategory
+
+
+SELECT
+	ProductKey, 
+	ProductName, 
+	DimProduct.ProductSubcategoryKey,
+	ProductSubcategoryName
+FROM
+	DimProduct
+INNER JOIN DimProductSubcategory
+	ON DimProduct.ProductSubcategoryKey = DimProductSubcategory.ProductSubcategoryKey
+
+-- LEFT JOIN: SE O INNER JOIN E O LEFT JOIN DÃO O MESMO RESULTADO: NÃO TEM NADA NA TABELA DA ESQUERDA QUE NÃO EXISTA NA DIREITA.
+
+SELECT
+	ProductKey, 
+	ProductName, 
+	DimProduct.ProductSubcategoryKey,
+	ProductSubcategoryName
+FROM
+	DimProduct
+LEFT JOIN DimProductSubcategory
+	ON DimProduct.ProductSubcategoryKey = DimProductSubcategory.ProductSubcategoryKey
+
+-- RIGHT JOIN
+
+SELECT
+	ProductKey, 
+	ProductName, 
+	DimProduct.ProductSubcategoryKey,
+	ProductSubcategoryName
+FROM
+	DimProduct
+RIGHT JOIN DimProductSubcategory
+	ON DimProduct.ProductSubcategoryKey = DimProductSubcategory.ProductSubcategoryKey
+
+
+-- MÚLTIPLOS JOINS
+
+SELECT ProductKey, ProductName, ProductSubcategoryKey FROM DimProduct
+SELECT ProductSubcategoryKey, ProductSubcategoryName, ProductCategoryKey FROM DimProductSubcategory
+SELECT ProductCategoryKey, ProductcategoryName FROM DimProductCategory
+
+SELECT
+	ProductKey,
+	ProductName,
+	DimProduct.ProductSubcategoryKey,
+	ProductCategoryName
+FROM
+	DimProduct
+INNER JOIN DimProductSubcategory -- PASSA SER A TABELA PRINCIPAL
+	ON DimProduct.ProductSubcategorykey = DimProduct.ProductSubcategorykey
+	INNER JOIN DimProductCategory
+		ON DimProductSubcategory.ProductSubcategoryKey = DimProductCategory.ProductCategoryKey
+
+-- UNION
+
+SELECT * FROM DimCustomer
+
+SELECT
+	*
+FROM
+	DimCustomer
+WHERE Gender = 'F'
+UNION
+SELECT
+	*
+FROM
+	DimCustomer
+WHERE Gender = 'M'
+
+-- UNION ALL
+
+SELECT
+	FirstName,
+	BirthDate
+FROM
+	DimCustomer
+WHERE Gender = 'F'
+UNION ALL
+SELECT
+	FirstName,
+	BirthDate
+FROM
+	DimCustomer
+WHERE Gender = 'M'

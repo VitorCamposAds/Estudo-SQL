@@ -1,0 +1,396 @@
+/* MÓDULO 14 - SUBQUERIES
+
+O QUE É UMA SUBQUERY? - APLICAÇÕES DE SUBQUERIES - SUBQUERIE ANINHADA - SUBQUERIE CORRELACIONADA - CTE's: COMMOON TABLE
+EXPRESSION
+
+
+Uma subquery (ou subconsulta ou subselect) é uma consulta dentro de uma consulta. Ou seja, com uma subquery consegue-se
+utilizar o resultado de uma query dentro de outra conulta. Umselect dentro de outro select
+
+2. Onde utilizamos este recurso?
+
+Três situações possíveis:
+
+a) junto com WHERE, funcionando como filtro variável
+b) junto com SELECT, como uma nova coluna na tabela
+c) Junto com o FROM, como uma nova tabela
+
+EX: imagina que vc quer selecionar os produtos com Preço maior do que a média. */
+
+-- 1º passo = descobrir a média:
+
+SELECT AVG(UnitPrice) FROM DimProduct
+
+-- 2º passo - para descobrir produtos acima da média de preço: filtrar a tabela
+
+SELECT
+	*
+FROM
+	DimProduct
+WHERE UnitPrice > 356.8301
+
+-- Exemplo acima com subquery:
+
+SELECT
+	*
+FROM
+	DimProduct
+WHERE UnitPrice > (SELECT AVG(UnitPrice) FROM DimProduct)
+
+/* Alguns exemplos de algumas situações possíveis:
+
+-- 1 - SUBQUERY JUNTO COM WHERE, COM UM FILTRO DINÂMICO E ESCALAR (VALOR ÚNICO) - exemplo acima.
+
+SELECT
+	Coluna1,
+	Coluna2,
+FROM
+	Tabela
+WHERE Coluna1 = (SELECT)
+
+-- 2 - SUBQUERY JUNTO COM UM WHERE, COMO UM FILTRO DINÂMICO E EM LISTA(VÁRIOS VALORES)
+
+SELECT
+	Coluna1,
+	Coluna2,
+FROM
+	Tabela
+WHERE Coluna1 IN (SELECT)
+
+-- 3 SUBQUERY JUNTO COM SELECT, COMO UMA NOVA COLUNA
+
+SELECT
+	Coluna1,
+	Coluna2,
+	(SELECT)
+FROM
+	Tabela
+
+-- 4 SUBQUERY JUNTO COM FROM, COMO UMA NOVA TABELA
+
+SELECT
+	Coluna1,
+	Coluna2
+FROM
+	(SELECT) AS Tabela */
+
+/* Exemplos Práticos de como utilizar subquery
+
+3 EXEMPLOS COM A APLICAÇÃO WHERE
+
+1 - Para entender a ideia por trás das subqueries, vamos começar fazendo 3 exemplos com a aplicação WHERE. No 1º exemplo, imagine que você queira
+fazer uma consulta à Tabela DimProduct e considerar apenas os produtos com os custos acima da média. Como poderíamos fazer isso? */
+
+SELECT AVG(UnitCost) FROM DimProduct
+
+SELECT
+	*
+FROM
+DimProduct
+WHERE UnitCost >= (SELECT AVG(UnitCost) FROM DimProduct)
+
+/* 2 - Queremos Filtrar nossa tabela DimProduct e retornar os produtos da categoria 'Televisions'. Porém, não temos a informação de Nome da
+Subcategoria na tabela DimProduct. Dessa forma, precisaremos criar um SELECT que descubra o ID da categoria 'Televisions', e passar esse resultado
+como o valor que queremos filtrar dentro do WHERE. */
+
+SELECT * FROM DimProduct
+WHERE ProductSubcategoryKey =
+	(SELECT ProductSubcategoryKey FROM DimProductSubcategory
+		WHERE ProductSubcategoryName = 'Televisions')
+
+-- 3 Queremos filtrar nossa tabela FactSales e mostrar apenas as vendas referentes às lojas com mais funcionários
+
+SELECT
+	StoreKey
+FROM
+	DimStore
+WHERE EmployeeCount >= 100
+
+SELECT * FROM FactSales
+WHERE StoreKey IN (
+	SELECT
+	StoreKey
+FROM
+	DimStore
+WHERE EmployeeCount >= 100
+)
+
+-- COMANDO ANY, SOME E ALL
+
+CREATE TABLE Funcionarios(
+id_funcionarios INT,
+nome VARCHAR(50),
+idade INT,
+sexo VARCHAR(50))
+
+INSERT INTO Funcionarios(id_funcionarios, nome, idade, sexo)
+VALUES
+	(1, 'Júlia', 20, 'F'),
+	(2, 'Daniel', 21, 'M'),
+	(3, 'Amanda', 22, 'F'),
+	(4, 'Pedro', 23, 'M'),
+	(5, 'André', 24, 'M'),
+	(6, 'Luisa', 25, 'F')
+
+-- Selecionando os funcionários do sexo masculino, mas utilizando a coluna de idade
+
+SELECT * FROM Funcionarios
+WHERE idade IN (21, 23, 24)
+
+
+SELECT * FROM Funcionarios
+WHERE idade IN (SELECT idade FROM Funcionarios WHERE sexo = 'M')
+
+-- ANY(valor1, valor2, valor3): equivale ao IN, retorna aslinhas da tabela que sejam iguais ao valor1, ou valor2, ou valor3
+
+SELECT * FROM Funcionarios
+WHERE idade = ANY (SELECT idade FROM Funcionarios WHERE sexo = 'M')
+
+SELECT * FROM Funcionarios
+WHERE idade = SOME (SELECT idade FROM Funcionarios WHERE sexo = 'M')
+-- SOME EQUIVALE AO ANY
+
+-- ALL
+
+SELECT * FROM Funcionarios
+WHERE idade > ALL (SELECT idade FROM Funcionarios WHERE sexo = 'M')
+
+-- EXISTS
+
+-- RETORNAR UMA TABELA COM TODOS OS PRODUTOS (ID Produto e Nome Produto) que possuem alguma venda no dia 01/07/2007
+
+SELECT COUNT(*) AS 'Produtos' FROM DimProduct -- 2.517 produtos
+
+SELECT TOP(100) * FROM FactSales
+
+SELECT
+	ProductKey,
+	ProductName
+FROM
+	DimProduct
+WHERE EXISTS(
+	SELECT
+		ProductKey
+	FROM
+		FactSales
+	WHERE
+		DateKey = '01/01/2007'
+		AND FactSales.ProductKey = DimProduct.ProductKey
+	)
+ORDER  BY ProductKey
+
+-- SUBQUERIES: SELECT
+-- RETORNAR UMA TABELA COM TODOS OS PRODUTOS(ID Produto e Nome Produto) e também o total de vendas para cada produto
+
+SELECT
+	ProductKey,
+	ProductName,
+	(SELECT COUNT(ProductKey) FROM FactSales WHERE FactSales.ProductKey = DimProduct.ProductKey) AS 'QTD_VENDAS'
+FROM
+	DimProduct
+ORDER BY 'QTD_VENDAS' DESC
+
+-- SUBQUERIES FROM
+-- RETORNAR A QUANTIDADE TOTAL DE PRODUTOS DA MARCA CONTOSO
+
+SELECT
+	COUNT(*)
+FROM DimProduct
+WHERE BrandName = 'Contoso' 
+
+SELECT
+	COUNT(*)
+FROM
+	(SELECT * FROM DimProduct WHERE BrandName = 'Contoso') AS T
+
+-- SUBQUERIES ANINHADAS
+-- DESCUBRA O NOME DOS CLIENTES QUE GANHAM O SEGUNDO MAIOR SALÁRIO
+
+SELECT
+	*
+FROM
+	DimCustomer
+WHERE CustomerType = 'Person'
+ORDER BY YearlyIncome DESC
+
+SELECT
+	DISTINCT TOP(2) YearlyIncome
+FROM
+	DimCustomer
+WHERE CustomerType = 'Person'
+ORDER BY YearlyIncome DESC
+
+
+SELECT
+	CustomerKey,
+	FirstName,
+	LastName,
+	YearlyIncome
+FROM
+	DimCustomer
+WHERE YearlyIncome = 160000
+
+-- FORMA DE RESOLUÇÃO COM A SUBQUERY ANINHADA
+
+-- PASSOS - 1º DESCOBRIR MAIOR SALÁRIO - 2º MAIOR SALÁRIO - 3º DESCOBRIR OS NOMES DOS CLIENTES QUE GANHAM O 2º MAIOR SALÁRIO
+
+SELECT
+	CustomerKey AS 'ID_Cliente',
+	CONCAT(FirstName, ' ', LastName) AS 'Nome Completo',
+	YearlyIncome AS 'Renda Anual'
+FROM
+	DimCustomer
+WHERE YearlyIncome = 160000
+
+
+-- DESCUBRA OS NOMES DOS CLIENTES QUE GANHAM O 2 MAIOR SALÁRIO
+
+
+-- MAIOR SALÁRIO
+
+SELECT
+	CustomerKey AS 'ID_Cliente',
+	CONCAT(FirstName, ' ', LastName) AS 'Nome Completo',
+	YearlyIncome AS 'Renda Anual'
+FROM
+	DimCustomer
+WHERE YearlyIncome = (
+	SELECT
+		MAX(YearlyIncome)
+	FROM
+		DimCustomer
+	WHERE CustomerType = 'Person'
+	)
+
+-- 2º MAIOR SALÁRIO
+
+SELECT
+	CustomerKey AS 'ID_Cliente',
+	CONCAT(FirstName, ' ', LastName) AS 'Nome Completo',
+	YearlyIncome AS 'Renda Anual'
+FROM
+	DimCustomer
+WHERE YearlyIncome = (
+	SELECT
+		MAX(YearlyIncome)
+	FROM
+		DimCustomer
+	WHERE YearlyIncome < (
+		SELECT
+			MAX(YearlyIncome)
+		FROM
+			DimCustomer
+		WHERE CustomerType = 'Person'
+		)
+	)
+
+-- CTE's - Common Table Expression
+/* CRIE UMA CTE PARA ARMAZENAR O RESULTADO DE UMA CONSULTA QUE CONTENHA: ProductKey, ProductName, BrandName, ColorName e UnitPrice,
+apenas para a marca 'Contoso' */
+
+WITH cte AS (
+SELECT
+	ProductKey, 
+	ProductName, 
+	BrandName, 
+	ColorName,
+	UnitPrice
+FROM
+	DimProduct
+WHERE BrandName = 'Contoso'
+)
+
+-- Consulta a CTE
+SELECT COUNT(*) FROM cte;
+
+-- CTE: CALCULANDO AGREGAÇÕES
+-- CRIE UMA CTE QUE SEJA  RESULTADO DO AGRUPAMENTO DE TOTAL DE PRODUTOS POR MARCA. FAÇA UMA MÉDIA DE PRODUTOS POR MARCA.
+
+WITH cte AS(
+SELECT
+	BrandName,
+	COUNT(*) AS 'TOTAL'
+FROM
+	DimProduct
+GROUP BY
+	BrandName
+)
+-- Consulta a CTE
+SELECT AVG(TOTAL) AS 'MÉDIA' FROM cte 
+
+-- TAMBÉM PODE COLOCAR AS COLUNAS DESTA FORMA
+
+WITH cte(Marca, Total) AS(
+SELECT
+	BrandName,
+	COUNT(*)
+FROM
+	DimProduct
+GROUP BY
+	BrandName
+)
+
+SELECT
+	Marca,
+	Total
+FROM
+	cte
+
+
+/*MULTIPLAS	cte's. Crie 2 Cte's - A primeira, chamada produtos contoso, contendo as seguintes colunas da tabela -
+DimProduct: ProductKey, ProductName, BrandName. A segunda, chamda vendas top(100), contendo as 100 vendas mais recentes considerando as seguintes
+colunas da tabela FactSales: SalesKey, ProductKey, DateKey, SalesQuantity
+
+-- Por fim faça um INNER JOIN nessas tabelas */
+
+WITH produtos_contoso AS (
+SELECT
+	ProductKey,  
+	ProductName,
+	BrandName
+FROM
+	DimProduct
+WHERE BrandName = 'Contoso'
+),
+vendas_top100 AS(
+SELECT TOP(100)
+	SalesKey, 
+	ProductKey, 
+	DateKey, 
+	SalesQuantity
+FROM
+	FactSales
+ORDER BY DateKey DESC
+)
+
+SELECT * FROM vendas_top100
+INNER JOIN produtos_contoso
+	ON vendas_top100.ProductKey = produtos_contoso.ProductKey
+
+/* 9 Crie uma CTE que seja o agrupamento da tabela DimProduct, armazenando o total de produtos por marca. Em seguida, faça um SELECT nesta CTE
+descobrindo qual é a quantidade máxima de produtos para uma marca. Chame essa CTE de CTE_QTDProdutosPorMarca */
+
+
+WITH CTE_QTDProdutosPorMarca AS (
+    SELECT
+        BrandName,
+        COUNT(*) AS 'Quantidade'
+    FROM
+        DimProduct
+    GROUP BY
+        BrandName
+)
+SELECT MAX(Quantidade) FROM CTE_QTDProdutosPorMarca;
+
+/* Crie duas Ctes:
+
+(i) a primeira deve conter as colunas ProductKey, ProductName, ProductSubCategoryKey, BrandName e UnitPrice, da tabela DimProduct, mas apenas
+os produtos da marca 'Adventure Works'. Chame essa CTE de CTE_ProdutosAdventureWorks.
+
+(ii) a segunda deve conter as colunas ProductSubcategoryKey, ProductSubcategoryName, da tabela DimProductSubcategory, mas apenas para as
+subcategorias 'Televisions' e 'Monitors'.
+
+Chame essa CTE de CTE_CategoriaTelevisionsEMonitors.
+
+Faça um Join entre as duas CTEs e o resultado deve ser uma query contendo todas as colunas das duas tabelas. Observe neste exemplo a diferença 
+entre o LEFT JOIN e o INNER JOIN. */

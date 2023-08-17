@@ -1,0 +1,113 @@
+-- MÓDULO 15 - LOOP  WHILE 
+-- Crie um loop que faça uma contagem de 1 até 10 utilizando a estrutura de repetição While
+
+DECLARE @varContador INT
+SET @varContador = 1
+
+WHILE @varContador <= 10
+BEGIN 
+	PRINT 'O valor do contador é: ' + CONVERT(VARCHAR, @VARcONTADOR)
+	SET @varContador = @varContador + 1		
+END
+--Sempre atentar-se ao contador para controlar o loop, senão cria-se um loop infinito
+
+
+-- LOOP WHILE BREAK
+--Faça um contador de 1 a 100. OBS: Se o valor do contador for igual a 15, então o loop WHILE deve ser encerrado
+
+DECLARE @varContador INT
+SET @varContador = 1
+
+WHILE @varContador <= 100
+BEGIN
+	PRINT 'O valor do contador é: ' + CONVERT(VARCHAR, @varContador)
+	IF @varContador = 15
+	BREAK
+	SET @varContador += 1
+END
+
+-- LOOP WHILE: CONTINUE
+-- FAÇA UM CONTADOR DE 1 A 10. OBS: OS NÚMEROS 3 OU 6 NÃO PODEM SER PRINTADOS NA TELA
+
+DECLARE @varContador INT
+SET @varContador = 0
+
+WHILE @varContador < 10
+BEGIN
+	SET @varContador += 1
+	IF @varContador = 3 OR @varContador = 6
+	CONTINUE
+	PRINT 'O valor da variável é: ' + CONVERT(VARCHAR, @varContador)
+END
+
+-- MÓDULO 15 - EXERCÍCIOS
+/*1 - Utilize o loop while para criar um contador que comece em um valor inicial @ValorInicial e termine em um valor @ValorFinal. Você deverá
+printar na tela a seguinte frase: "O valor do contador é: */
+
+DECLARE @ValorInicial INT,
+		@ValorFinal INT
+SET @ValorInicial = 0
+SET	@ValorFinal = 11
+
+WHILE @ValorInicial < @ValorFinal
+BEGIN
+	PRINT 'O valor do contador é: ' + CONVERT(VARCHAR, @ValorInicial)
+	SET @ValorInicial += 1
+END
+
+/* 2 Você deverá criar uma estrutura de repetição que printe na tela a quantidade de contrações para cada ano, desde 1996 até 2003. A informação
+de data de contratação encontra-se na coluna HireDate da tabela DimEmployee. Utiliza o formato:
+x contratações em 1996
+y contratações em 1997
+z contratações em 1998
+...
+...  
+N contratações em 2003
+Observação: a coluna HireDate contém a data completa(dd/mm/aaaa). Lembrando que você deverá printar a quantidade de contratações por ano*/
+
+SELECT * FROM DimEmployee
+
+DECLARE @varAnoInicial INT = 1996
+DECLARE @AnoFinal INT = 2003
+
+WHILE @varAnoInicial <= @AnoFinal
+BEGIN
+	DECLARE @QtdFuncionarios INT = (SELECT COUNT(*) FROM DimEmployee 
+									WHERE YEAR(HireDate) = @varAnoInicial)
+	PRINT CONCAT(@QtdFuncionarios, ' contratações em ', @varAnoInicial,'.')
+	SET @varAnoInicial += 1
+END
+
+/* 3 - Utilize um Loop While para criar uma tabela chamada calendário, contendo uma coluna que comece com a data 01/01/2021 e vá até
+31/12/2021 */
+
+-- Criar tabela calendario
+
+-- Criar tabela calendario
+CREATE TABLE Calendario
+(
+    DATA DATE
+)
+
+-- Variáveis de início e fim
+DECLARE @CalendarioInicio DATE = '01/01/2021',
+        @CalendarioFim DATE = '31/12/2021'
+
+-- Variável de iteração
+DECLARE @DataAtual DATE = @CalendarioInicio
+
+-- Loop While para inserir as datas na tabela
+WHILE @DataAtual <= @CalendarioFim
+BEGIN
+    -- Inserir a data atual na tabela
+    INSERT INTO calendario (Data) VALUES (@DataAtual)
+
+    -- Incrementar a data atual para a próxima iteração
+    SET @DataAtual = DATEADD(DAY, 1, @DataAtual)
+END
+
+-- Verificar os dados na tabela
+SELECT * FROM Calendario
+
+
+DROP TABLE calendario

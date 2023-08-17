@@ -1,0 +1,262 @@
+-- WHERE COM LIKE - como se fosse a representação de um texto que está dentro do sinal de %, como nos exemplos abaixo:
+SELECT * FROM DimProduct
+WHERE ProductName LIKE '%Mp3 Player%'
+
+SELECT ProductName
+FROM	DimProduct
+WHERE ProductName LIKE '%Mp3 Player%'
+
+SELECT * FROM DimProduct
+WHERE ProductDescription LIKE '%Type%'
+
+-- Agora as linhas que somente as linhas que começam com 'Type' é só retirar o sinal de % no inicio
+
+SELECT * FROM DimProduct
+WHERE ProductDescription LIKE 'Type%'
+
+SELECT ProductDescription
+FROM DimProduct
+WHERE ProductDescription like 'Type%'
+
+-- Agora retorno que termina com o texto 'wma'.
+
+SELECT * FROM DimProduct
+WHERE ProductDescription LIKE '%WMA'
+
+SELECT ProductDescription
+FROM DimProduct
+WHERE ProductDescription like '%WMA'
+
+-- WHERE EM CONJUNTO COM BETWEEN
+
+SELECT * FROM DimProduct
+WHERE UnitPrice BETWEEN 50 AND 100
+
+SELECT UnitPrice
+FROM DimProduct
+WHERE UnitPrice BETWEEN 50 AND 100
+
+-- EXEMPLO DE COMANDO BETWEEN COM NOT
+
+SELECT * FROM DimProduct
+WHERE UnitPrice NOT BETWEEN 50 AND 100
+
+SELECT UnitPrice
+FROM DimProduct
+WHERE UnitPrice NOT BETWEEN 50 AND 100
+
+
+-- EXEMPLO DE COMANDO BETWEEN COM DATA
+
+SELECT * FROM DimEmployee
+WHERE HireDate BETWEEN '2000/01/01' AND '2000/12/31'
+
+SELECT	HireDate
+FROM	DimEmployee
+WHERE	HireDate BETWEEN '2000/01/01' AND '2000/12/31'
+
+
+-- FILTRO PARA NULL (INFO VAZIA)
+
+SELECT * FROM DimCustomer
+WHERE CompanyName IS NOT NULL
+
+SELECT * FROM DimCustomer
+WHERE CompanyName IS NULL
+
+-- EXERCÍCIOS MÓDULO 4
+
+/*1 Você é o gerente da área de compras e precisa criar um relatório com as TOP 100 vendas de acordo com a quantidade vendida. Você precisa
+ fazer isso em 10mins, pois o diretor de compras solicitou essa informação para apresentar em uma reunião. Utilize seu conheciment em SQL 
+ para buscar essas top 100 vendas, de acordo com o total vendido (SalesAmount)*/
+
+ SELECT * FROM FactSales
+
+ SELECT
+	TOP(100) SalesQuantity
+ FROM 
+	FactSales
+ ORDER BY SalesQuantity DESC
+
+/*Eercício 2 - Os top 10 produtos com maior UnitPrice possuem exatamente o mesmo preço. Porém, a empresa quer diferenciar esses preços de acordo com o 
+ peso (wieght) de cada um. O que você precisa fazer é ordenar esses top 10 produtos, de acordo com a coluna de UnitPrice e, além disso,
+ estabelecer um critério de desempate, para que seja mostrado na ordem, do maior para o menor. Caso, ainda assim, haja empate entre 2 ou mais
+ produtos, pense em uma forma de criar um segundo critério de desempate (além do peso).*/
+
+SELECT
+	TOP(10) UnitPrice, Weight, AvailableForSaleDate
+FROM DimProduct
+ORDER BY UnitPrice DESC, Weight DESC, AvailableForSaleDate ASC
+
+/* Exercício 3 - pdf
+3. Você é responsável pelo setor de logística da empresa Contoso e precisa dimensionar o
+transporte de todos os produtos em categorias, de acordo com o peso.
+Os produtos da categoria A, com peso acima de 100kg, deverão ser transportados na primeira
+leva.
+Faça uma consulta no banco de dados para descobrir quais são estes produtos que estão na
+categoria A.
+a) Você deverá retornar apenas 2 colunas nessa consulta: Nome do Produto e Peso.
+b) Renomeie essas colunas com nomes mais intuitivos.
+c) Ordene esses produtos do mais pesado para o mais leve */
+
+
+SELECT 
+	ProductName AS 'NOME_DO_PRODUTO', 
+	Weight AS 'PESO'
+FROM 
+	DimProduct
+WHERE Weight >= 100
+ORDER BY Weight DESC
+
+/* Exerício 4 - pdf 
+4. Você foi alocado para criar um relatório das lojas registradas atualmente na Contoso.
+a) Descubra quantas lojas a empresa tem no total. Na consulta que você deverá fazer à tabela
+DimStore, retorne as seguintes informações: StoreName, OpenDate, EmployeeCount
+b) Renomeeie as colunas anteriores para deixar a sua consulta mais intuitiva.
+c) Dessas lojas, descubra quantas (e quais) lojas ainda estão ativas */
+
+SELECT * FROM DimStore
+
+SELECT	
+	StoreName AS 'NOME_DA_LOJA',
+	OpenDate AS 'DATA_DE_ABERTURA',
+	EmployeeCount AS 'NÚMERO_DE_FUCIONÁRIOS'
+FROM DimStore
+WHERE StoreType = 'Store' and Status = 'on'
+
+/* EXERCÍCIO 5 - PDF
+5. O gerente da área de controle de qualidade notificou à Contoso que todos os produtos Home
+Theater da marca Litware, disponibilizados para venda no dia 15 de março de 2009, foram
+identificados com defeitos de fábrica.
+O que você deverá fazer é identificar os ID’s desses produtos e repassar ao gerente para que ele
+possa notificar as lojas e consequentemente solicitar a suspensão das vendas desses produtos. */
+
+SELECT * FROM DimProduct
+
+SELECT
+	*
+FROM DimProduct
+WHERE BrandName = 'Litware' and ProductName LIKE '%Home Theater%' AND AvailableForSaleDate = '20090315'
+
+/* EXERCÍCIO 6 PDF
+6. Imagine que você precise extrair um relatório da tabela DimStore, com informações de lojas.
+Mas você precisa apenas das lojas que não estão mais funcionando atualmente.
+a) Utilize a coluna de Status para filtrar a tabela e trazer apenas as lojas que não estão mais
+funcionando.
+b) Agora imagine que essa coluna de Status não existe na sua tabela. Qual seria a outra forma
+que você teria de descobrir quais são as lojas que não estão mais funcionando? */
+
+SELECT * FROM DimStore
+
+SELECT
+	*
+FROM
+	DimStore
+WHERE Status = 'On'
+
+SELECT
+	*
+FROM
+	DimStore
+WHERE CloseDate IS NOT NULL
+
+/*EXERCÍCIO 7 - PDF
+
+7. De acordo com a quantidade de funcionários, cada loja receberá uma determinada quantidade
+de máquinas de café. As lojas serão divididas em 3 categorias:
+CATEGORIA 1: De 1 a 20 funcionários -> 1 máquina de café
+CATEGORIA 2: De 21 a 50 funcionários -> 2 máquinas de café
+CATEGORIA 3: Acima de 51 funcionários -> 3 máquinas de café
+Identifique, para cada caso, quais são as lojas de cada uma das 3 categorias acima (basta fazer
+uma verificação) */
+
+
+
+-- CATEGORIA 1
+
+SELECT * FROM DimStore
+
+SELECT
+	EmployeeCount AS 'FUNCIONÁRIOS',
+	StoreName AS 'NOME_DA_LOJA'
+FROM
+	DimStore
+WHERE 
+	EmployeeCount 
+BETWEEN 1 AND 20
+ORDER BY EmployeeCount
+
+-- CATEGORIA 2
+
+SELECT
+	EmployeeCount,
+	StoreName
+FROM
+	DimStore
+WHERE 
+	EmployeeCount 
+BETWEEN 21 AND 50
+ORDER BY EmployeeCount
+
+-- CATEGORIA 3
+
+SELECT
+	EmployeeCount,
+	StoreName
+FROM
+	DimStore
+WHERE 
+	EmployeeCount > 50
+ORDER BY EmployeeCount
+
+
+/*8. A empresa decidiu que todas as televisões de LCD receberão um super desconto no próximo
+mês. O seu trabalho é fazer uma consulta à tabela DimProduct e retornar os ID’s, Nomes e
+Preços de todos os produtos LCD existentes */
+
+SELECT * FROM DimProduct
+
+SELECT
+	ProductKey AS 'ID',
+	ProductName AS 'NOME_DO_PRODUTO',
+	UnitPrice AS 'PREÇO_DO_PRODUTO'
+FROM
+	DimProduct
+WHERE ProductDescription LIKE '%LCD%'
+ORDER BY UnitPrice DESC
+
+
+/* 9. Faça uma lista com todos os produtos das cores: Green, Orange, Black, Silver e Pink. Estes
+produtos devem ser exclusivamente das marcas: Contoso, Litware e Fabrikam */
+
+SELECT * FROM DimProduct
+
+SELECT 
+	*
+FROM
+	DimProduct
+
+WHERE ColorName IN ('Green', 'Black', 'Silver', 'Pink', 'Orange') AND BrandName IN ('Contoso', 'Litware', 'Fabrikam')
+
+
+
+
+/* 10. A empresa possui 16 produtos da marca Contoso, da cor Silver e com um UnitPrice entre 10 e
+30. Descubra quais são esses produtos e ordene o resultado em ordem decrescente de acordo
+com o preço (UnitPrice). */
+
+SELECT * FROM DimProduct
+
+SELECT
+	ProductDescription,
+	ProductName,
+	UnitPrice,
+	Weight,
+	BrandName,
+	ColorName,
+	ProductKey
+FROM
+	DimProduct
+WHERE ColorName = 'Silver' and Weight BETWEEN 10 AND 30 and BrandName = 'Contoso'
+ORDER BY UnitPrice DESC
+
