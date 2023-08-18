@@ -1,0 +1,108 @@
+use aula;
+create table funcionario (cod int(3) not null auto_increment, nome varchar(45) not null, sexo char(1) not null, salario decimal(6,2) not null, primary key (cod));
+-- se eu não digo as colunas que serão inseridas, como no cod abaixo, p. ex., obrigatoriamente se utiliza todas as colunas da tabela funcionario e na mesma ordem.
+insert into funcionario values (null, 'Pedro', 'M', 7820.00);
+insert into funcionario values (null, 'Maria', 'F', 9320.00);
+insert into funcionario values (null, 'João', 'M', 2390.80);
+insert into funcionario values (null, 'Marta', 'F', 3450.75);
+-- Criar a store procedure func_minimo para retornar o número de funcionários que ganham menos de x reais (passar como parâmetro valor desejado)
+select * FROM  funcionario;
+
+DELIMITER $$
+CREATE PROCEDURE func_minimo (sal decimal)
+select count(*) from funcionario where salario < sal; 
+$$
+-- criar uma store procedure chamada func_salario para retornar o salário de um funcionário específico
+delimiter $$
+create procedure func_salario (id smallint)
+select * from funcionario where cod = id;
+$$
+call func_salario(1);
+-- criar store procedure aumento para dar 10% de aumento no salário dos funcionarios:
+delimiter $$
+create procedure aumento ()
+update funcionario set salario = (salario * 0.1) where cod > 0;
+$$
+call aumento();
+DROP PROCEDURE func_salario
+
+-- Criar a função soma para retornar a soma de dois numeros inteiros(passar por parâmetros):
+-- Segundo a documentação do MySQL, ao criar uma função armazenada, você deve declarar que ela é determinística ou que não modifica os dados(atualizar, inserir ou deletar). Caso contrário, pode não ser seguro para recuperação ou replicação de dados. Caso isso não seja feito ocorre o erro que você informou. Então para relaxar essas condições na criação da função, você pode definir a variável global do sistema para 1:
+
+SET GLOBAL log_bin_trust_function_creators = 1;
+delimiter $$
+create function soma(a int, b int)
+returns int
+return a + b ;
+$$
+select soma(8,2) as Soma;
+-- Criar a function salário para retornar o salário de um funcionario específico(passar por parâmetro)
+delimiter $$
+create function salario(id smallint)
+returns decimal(6,2)
+return (select salario from funcionario where cod = id);
+$$
+select salario(2);
+select * from funcionario;
+-- Criar uma função fun_sexo cujo objetivo é passar o sexo como parâmetro retornando o numero de funcionários do sexo informado
+delimiter $$
+create function func_sexo(p_sexo char)
+returns int
+return(select count(*) from funcionario where sexo = p_sexo);
+$$
+select func_sexo('M');
+-- Apagar a função soma:
+drop function soma;
+-- Criar uma tabela back_up com: codigo int(3) AI PK, nome varchar(40), salario decimal(6,2):
+create table back_up(codigo int(3) not null auto_increment, nome varchar(40) not null, salario decimal(7,2) not null, primary key (codigo));
+-- Criar uma Trigger (faz_back_up) para quando deletar um funcionário gravar o nome e o salário na tabela backu_up:
+-- Lembre-se que trigger não possui chamada e executa-se sozinha.
+delimiter $$
+create trigger faz_backup before delete
+on funcionario
+for each row
+begin
+insert into back_up(nome, salario) values (old.nome, old.salario);
+end
+$$
+
+select * from back_up;
+delete from funcionario where cod = 1;
+
+-- Criar a função num_backup para retornar quantos funcionários existem na tabela back_up:
+Delimiter $$
+create function num_backup()
+returns int
+return (select count(*) from back_up);
+$$
+-- Criar um store procedure Num_sexo, passando como parâmetro o sexo e retornar o número de funcionários daquele sexo (usar a condicional SE):
+delimiter $$
+create procedure num_sexo (p_sexo char)
+begin
+if (p_sexo = 'M') then
+select count(*) from funcionario where sexo = 'M';
+elseif (p_sexo = 'F') then
+select count(*) from funcionario where sexo = 'F';
+end if;
+end
+$$
+call num_sexo('F');
+select * from funcionario;
+
+--Criar uma procedure passando como parâmetro o sexo e retornar os funcionários daquele sexo (utilizar a condicional SE)
+
+delimiter $$
+create procedure ver_funcionario (p_sexo char)
+begin
+if (p_sexo = 'M') then
+select * from funcionario where sexo = 'M';
+elseif (p_sexo = 'F') then
+select * from funcionario where sexo = 'F';
+end if;
+end
+$$
+
+call ver_funcionario('M');
+
+-- Apagar a Trigger back_up:
+Drop trigger faz_backup;
